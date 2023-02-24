@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NorthSound.Domain.Models;
-using NorthSound.Domain.Interfaces;
+using NorthSound.Domain.Entities;
+using NorthSound.Backend.LibraryApplication.Services.Base;
+using NorthSound.Backend.LibraryApplication.ViewModels;
 
 namespace NorthSound.Backend.LibraryApplication.Controllers;
 
@@ -9,72 +10,75 @@ namespace NorthSound.Backend.LibraryApplication.Controllers;
 public class LibraryController : ControllerBase
 {
     private readonly ILogger<LibraryController> _logger;
-    private readonly IAsyncSongRepository _repository;
+    private readonly ILibraryService _library;
 
-    public LibraryController(ILogger<LibraryController> logger, IAsyncSongRepository repository)
+    public LibraryController(
+        ILogger<LibraryController> logger,
+        ILibraryService libraryService)
     {
         _logger = logger;
-        _repository = repository;
-
-        _logger.LogInformation("Контроллер запущен");
+        _library = libraryService;
     }
 
     // GET: api/songlibrary/
     [HttpGet]
     public IEnumerable<Song> Get()
     {
-        return _repository.GetSongs();
+        return _library.GetSongs();
     }
 
     // GET: api/songlibrary/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Song>> Get(int id)
+    public async Task<ActionResult> Get(int id)
     {
-        Song? entity = await _repository.GetSongByIdAsync(id);
+        Song? entity = await _library.GetSongAsync(id);
 
-        if (entity is Song song)
-            return Ok(song);
-            
-        return BadRequest();
-    }
-
-    // PUT: api/songlibrary/
-    [HttpPut]
-    public async Task<ActionResult<Song>> Put(Song entity)
-    {
-        if (!ModelState.IsValid || entity is null)
+        if (entity is null)
             return BadRequest();
 
-        if (await _repository.GetSongByIdAsync(entity.Id) is null)
-            return BadRequest();
-
-        await _repository.Update(entity);
-        await _repository.SaveAsync();
-        return Ok(entity);
+        try
+        {
+            var fileStream = _library.GetFileStream(entity);
+            return File(fileStream, ILibraryService.AudioContentType, $"{entity.Author} - {entity.Name}.mp3");
+        }
+        catch (Exception exception)
+        {
+            _logger.LogWarning("Ошибка в получении файла: id: {id}", id);
+            _logger.LogWarning("Вызвано исключение: {exception}", exception);
+            return NoContent();
+        }
     }
 
     // POST: api/songlibrary/
     [HttpPost]
-    public async Task<ActionResult<Song>> Post(Song entity)
+    public async Task<ActionResult> Post([FromForm] SongViewModel viewModel)
     {
-        if (entity is null)
+        if (viewModel.Validate() is false)
             return BadRequest();
 
-        await _repository.CreateAsync(entity);
-        await _repository.SaveAsync();
-        return Ok(entity);
+        try
+        {
+            Song newEntity = await _library.CreateSongAsync(viewModel);
+            return Ok(newEntity);
+        }
+        catch (Exception)
+        {
+            _logger.LogWarning("Bad request // Невозможно создать сущность в БД");
+            return BadRequest();
+        }
+        
     }
 
     // DELETE: api/songlibrary/5
     [HttpDelete]
-    public async Task<ActionResult<Song>> Delete(int id)
+    public async Task<ActionResult> Delete(int id)
     {
-        Song? entity = await _repository.GetSongByIdAsync(id);
+        Song? entity = await _library.GetSongAsync(id);
 
         if (entity is null)
             return BadRequest();
 
-        await _repository.DeleteAsync(id);
+        await _library.DeleteAsync(id);
         return Ok(entity);
     }
 }

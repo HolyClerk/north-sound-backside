@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using NorthSound.Backend.LibraryApplication.Services;
+using NorthSound.Backend.LibraryApplication.Services.Base;
 using NorthSound.Domain.Interfaces;
 using NorthSound.Infrastructure.Data;
 
@@ -17,7 +19,8 @@ public class Program
         ConnectDatabase(builder);
 
         builder.Services
-            .AddScoped<IAsyncSongRepository, AsyncSongRepository>();
+            .AddScoped<IAsyncSongRepository, AsyncSongRepository>()
+            .AddScoped<ILibraryService, LibraryService>();
 
         var app = builder.Build();
 
@@ -40,7 +43,7 @@ public class Program
 
     public static void ConnectDatabase(WebApplicationBuilder builder)
     {
-        string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
+        string? connection = builder.Configuration.GetConnectionString("PgConnection");
 
         if (connection is null)
             throw new Exception("Wrong connection");
