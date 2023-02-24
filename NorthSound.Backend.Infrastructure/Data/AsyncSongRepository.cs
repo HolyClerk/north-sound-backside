@@ -2,7 +2,7 @@
 using NorthSound.Domain.Interfaces;
 using NorthSound.Domain.Entities;
 
-namespace NorthSound.Infrastructure.Data;
+namespace NorthSound.Backend.Infrastructure.Data;
 
 public class AsyncSongRepository : IAsyncSongRepository
 {
