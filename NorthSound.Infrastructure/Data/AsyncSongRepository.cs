@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NorthSound.Domain.Interfaces;
-using NorthSound.Domain.Models;
+using NorthSound.Domain.Entities;
 
 namespace NorthSound.Infrastructure.Data;
 
 public class AsyncSongRepository : IAsyncSongRepository
 {
-    private SongContext _songContext;
+    private readonly SongContext _songContext;
 
     public AsyncSongRepository(SongContext songContext)
     {
@@ -23,13 +23,13 @@ public class AsyncSongRepository : IAsyncSongRepository
         await _songContext.AddAsync(entity);
     }
 
-    public async Task<Song?> GetSongByIdAsync(int id)
+    public async Task<Song?> GetSongAsync(int id)
     {
         return
             await _songContext.Songs.FindAsync(id);
     }
 
-    public async Task Update(Song entity)
+    public async Task UpdateAsync(Song entity)
     {
         Song? current = await _songContext.Songs.FindAsync(entity.Id);
 

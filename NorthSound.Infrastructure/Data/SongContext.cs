@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NorthSound.Domain.Models;
+using NorthSound.Domain.Entities;
 
 namespace NorthSound.Infrastructure.Data;
 

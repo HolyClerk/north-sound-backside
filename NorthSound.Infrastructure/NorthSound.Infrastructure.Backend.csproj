@@ -7,17 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NorthSound.Domain.Interfaces\NorthSound.Domain.Interfaces.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="NorthSound.Domain">
-      <HintPath>..\..\north-sound\NorthSound.Domain\bin\Release\net6.0\NorthSound.Domain.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
