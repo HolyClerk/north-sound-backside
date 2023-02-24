@@ -14,7 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\NorthSound.Domain.Interfaces\NorthSound.Domain.Interfaces.csproj" />
     <ProjectReference Include="..\NorthSound.Infrastructure\NorthSound.Infrastructure.Backend.csproj" />
-    <ProjectReference Include="..\NorthSound.Services\NorthSound.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>

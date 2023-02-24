@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NorthSound.Domain.Entities;
-using NorthSound.Backend.LibraryApplication.Services.Base;
+using NorthSound.Domain.Interfaces;
 using NorthSound.Backend.LibraryApplication.ViewModels;
 
 namespace NorthSound.Backend.LibraryApplication.Controllers;
@@ -58,7 +58,14 @@ public class LibraryController : ControllerBase
 
         try
         {
-            Song newEntity = await _library.CreateSongAsync(viewModel);
+            var mappedEntity = new Song()
+            {
+                Name = viewModel.Name,
+                Author = viewModel.Author,
+            };
+
+            var stream = viewModel.SongFile.OpenReadStream();
+            Song newEntity = await _library.CreateSongAsync(mappedEntity, stream);
             return Ok(newEntity);
         }
         catch (Exception)

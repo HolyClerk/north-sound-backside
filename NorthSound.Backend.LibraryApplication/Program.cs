@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using NorthSound.Backend.LibraryApplication.Services;
-using NorthSound.Backend.LibraryApplication.Services.Base;
 using NorthSound.Domain.Interfaces;
-using NorthSound.Infrastructure.Data;
+using NorthSound.Backend.Infrastructure;
+using NorthSound.Backend.Infrastructure.Data;
 
 namespace NorthSound.Backend.LibraryApplication;
 
