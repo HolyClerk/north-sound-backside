@@ -14,5 +14,5 @@ public interface ILibraryService
     Task<Song?> GetSongAsync(int id);
     Task<BaseResponse<FileStreamResult>> GetSongStreamResultAsync(int id);
     Task<Song> CreateSongAsync(Song entity, Stream stream);
-    Task<bool> DeleteAsync(int id);
+    Task<bool> TryDeleteAsync(int id);
 }

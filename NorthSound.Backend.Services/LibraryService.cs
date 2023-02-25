@@ -70,7 +70,7 @@ public class LibraryService : ILibraryService
         return mappedSong;
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<bool> TryDeleteAsync(int id)
     {
         Song? entity = await _repository.GetSongAsync(id);
 

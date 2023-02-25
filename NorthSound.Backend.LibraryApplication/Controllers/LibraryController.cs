@@ -70,7 +70,7 @@ public class LibraryController : ControllerBase
     [HttpDelete]
     public async Task<ActionResult> Delete(int id)
     {
-        var isDeleted = await _library.DeleteAsync(id);
+        var isDeleted = await _library.TryDeleteAsync(id);
 
         if (isDeleted is false)
             return BadRequest();
