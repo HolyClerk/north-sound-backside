@@ -1,4 +1,5 @@
-﻿using NorthSound.Backend.Services.Abstractions;
+﻿using NorthSound.Backend.Domain.Entities;
+using NorthSound.Backend.Services.Abstractions;
 using System.ComponentModel.DataAnnotations;
 
 namespace NorthSound.Backend.LibraryApplication.ViewModels;
@@ -17,5 +18,14 @@ public class SongViewModel
             (this.SongFile.Length < ILibraryService.MaxSizeOfFile) &&
             (this.SongFile.Length > ILibraryService.MinSizeOfFile) &&
             (this.SongFile.ContentType is ILibraryService.AudioContentType);
+    }
+
+    public Song MapToSong()
+    {
+        return new Song()
+        {
+            Name = this.Name,
+            Author = this.Author,
+        };
     }
 }
