@@ -1,5 +1,7 @@
-﻿using NorthSound.Backend.DAL.Abstractions;
+﻿using Microsoft.AspNetCore.Mvc;
+using NorthSound.Backend.DAL.Abstractions;
 using NorthSound.Backend.Domain.Entities;
+using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
 using System.Security.Cryptography;
 
@@ -24,12 +26,30 @@ public class LibraryService : ILibraryService
         return await _repository.GetSongAsync(id); 
     }
 
-    public FileStream GetFileStream(Song entity)
+    public async Task<BaseResponse<FileStreamResult>> GetSongStreamResultAsync(int id)
     {
+        var response = new BaseResponse<FileStreamResult>();
+        var entity = await _repository.GetSongAsync(id);
+
+        if (entity is null)
+        {
+            response.Status = ResponseStatus.NotFound;
+            return response;
+        }
+
         if (entity.Path is null)
             throw new NullReferenceException(nameof(entity.Path));
 
-        return new FileStream(entity.Path.AbsolutePath, FileMode.Open);
+        var fileStream = new FileStream(entity.Path.AbsolutePath, FileMode.Open);
+        var streamResult = new FileStreamResult(fileStream, ILibraryService.AudioContentType)
+        {
+            FileDownloadName = $"{entity.Author} - {entity.Name}.mp3"
+        };
+
+        response.Status = ResponseStatus.Success;
+        response.ResponseData = streamResult;
+
+        return response;
     }
 
     public async Task<Song> CreateSongAsync(Song entity, Stream stream)
@@ -50,10 +70,16 @@ public class LibraryService : ILibraryService
         return mappedSong;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
+        Song? entity = await _repository.GetSongAsync(id);
+
+        if (entity is null)
+            return false;
+
         await _repository.DeleteAsync(id);
         await _repository.SaveAsync();
+        return true;
     }
 
     private async Task CopyStreamAsync(Stream stream, string pathToCopy)
