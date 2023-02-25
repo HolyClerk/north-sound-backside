@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using NorthSound.Backend.DAL.Abstractions;
+﻿using NorthSound.Backend.DAL.Abstractions;
 using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
@@ -26,9 +25,9 @@ public class LibraryService : ILibraryService
         return await _repository.GetSongAsync(id); 
     }
 
-    public async Task<BaseResponse<FileStreamResult>> GetSongStreamResultAsync(int id)
+    public async Task<BaseResponse<SongFile>> GetSongFileAsync(int id)
     {
-        var response = new BaseResponse<FileStreamResult>();
+        var response = new BaseResponse<SongFile>();
         var entity = await _repository.GetSongAsync(id);
 
         if (entity is null)
@@ -37,37 +36,41 @@ public class LibraryService : ILibraryService
             return response;
         }
 
-        if (entity.Path is null)
-            throw new NullReferenceException(nameof(entity.Path));
-
-        var fileStream = new FileStream(entity.Path.AbsolutePath, FileMode.Open);
-        var streamResult = new FileStreamResult(fileStream, ILibraryService.AudioContentType)
-        {
-            FileDownloadName = $"{entity.Author} - {entity.Name}.mp3"
-        };
-
         response.Status = ResponseStatus.Success;
-        response.ResponseData = streamResult;
+        response.ResponseData = new SongFile()
+        {
+            Name = $"{entity.Author} - {entity.Name}",
+            FileStream = new FileStream(entity.Path.AbsolutePath, FileMode.Open),
+            ContentType = ILibraryService.AudioContentType,
+        };
 
         return response;
     }
 
-    public async Task<Song> CreateSongAsync(Song entity, Stream stream)
+    public async Task<BaseResponse<SongModel>> CreateSongAsync(Song entity, Stream stream, IStorageGenerator storage)
     {
-        string generatedName = RandomNumberGenerator
-            .GetInt32(-2_147_483_640, 2_147_483_640)
-            .ToString();
+        var response = new BaseResponse<SongModel>();
+        var pathToFile = storage.GenerateStoragePath();
 
-        var songPath = $"Z:\\Storage\\{generatedName}";     // Путь к треку (внутри хранилища)
+        entity.Path = new Uri(pathToFile);
+        Task copyTask = CopyStreamAsync(stream, pathToFile);  // Копируем трек в хранилище
 
-        Task copyTask = CopyStreamAsync(stream, songPath);  // Копируем трек в хранилище
-        Song mappedSong = MapEntity(entity, songPath);      // Получаем сущность 
+        try
+        {
+            await _repository.CreateAsync(entity);
+            await _repository.SaveAsync();
+            await copyTask;
 
-        await _repository.CreateAsync(mappedSong);
-        await _repository.SaveAsync();
-        await copyTask;
+            response.Status = ResponseStatus.Success;
+            response.ResponseData = new SongModel(entity);
 
-        return mappedSong;
+            return response;
+        }
+        catch (Exception)
+        {
+            response.Status = ResponseStatus.Failed;
+            return response;
+        }
     }
 
     public async Task<bool> TryDeleteAsync(int id)
@@ -89,17 +92,5 @@ public class LibraryService : ILibraryService
             await stream.CopyToAsync(fileStream);
             await stream.DisposeAsync();
         }
-    }
-
-    private static Song MapEntity(Song entityToMap, string songPath)
-    {
-        Song mappedEntity = new Song()
-        {
-            Name = entityToMap.Name,
-            Author = entityToMap.Author,
-            Path = new Uri(songPath),
-        };
-
-        return mappedEntity;
     }
 }

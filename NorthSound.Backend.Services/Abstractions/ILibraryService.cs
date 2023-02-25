@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using NorthSound.Backend.Domain.Entities;
+﻿using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.Responses;
 
 namespace NorthSound.Backend.Services.Abstractions;
@@ -12,7 +11,7 @@ public interface ILibraryService
 
     IEnumerable<Song> GetSongs();
     Task<Song?> GetSongAsync(int id);
-    Task<BaseResponse<FileStreamResult>> GetSongStreamResultAsync(int id);
-    Task<Song> CreateSongAsync(Song entity, Stream stream);
+    Task<BaseResponse<SongFile>> GetSongFileAsync(int id);
+    Task<BaseResponse<SongModel>> CreateSongAsync(Song entity, Stream stream, IStorageGenerator storage);
     Task<bool> TryDeleteAsync(int id);
 }
