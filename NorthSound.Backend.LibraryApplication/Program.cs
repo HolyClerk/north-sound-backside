@@ -20,7 +20,8 @@ public class Program
 
         builder.Services
             .AddScoped<IAsyncSongRepository, AsyncSongRepository>()
-            .AddScoped<ILibraryService, LibraryService>();
+            .AddScoped<ILibraryService, LibraryService>()
+            .AddSingleton<IStorageGenerator, LocalStorageGenerator>();
 
         var app = builder.Build();
 
@@ -34,7 +35,6 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
-
 
         app.MapControllers();
 
