@@ -1,8 +1,9 @@
-﻿using NorthSound.Domain.Interfaces;
-using NorthSound.Domain.Entities;
+﻿using NorthSound.Backend.DAL.Abstractions;
+using NorthSound.Backend.Domain.Entities;
+using NorthSound.Backend.Services.Abstractions;
 using System.Security.Cryptography;
 
-namespace NorthSound.Backend.Infrastructure;
+namespace NorthSound.Backend.Services;
 
 public class LibraryService : ILibraryService
 {

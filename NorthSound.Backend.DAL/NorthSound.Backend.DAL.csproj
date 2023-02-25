@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NorthSound.Domain.Interfaces\NorthSound.Domain.Interfaces.csproj" />
+    <ProjectReference Include="..\NorthSound.Backend.Domain\NorthSound.Backend.Domain.csproj" />
   </ItemGroup>
 
 </Project>

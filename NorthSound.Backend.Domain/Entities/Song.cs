@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NorthSound.Domain.Entities;
+namespace NorthSound.Backend.Domain.Entities;
 
 public class Song
 {

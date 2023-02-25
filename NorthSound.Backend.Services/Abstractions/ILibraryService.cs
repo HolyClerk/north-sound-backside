@@ -1,6 +1,6 @@
-﻿using NorthSound.Domain.Entities;
+﻿using NorthSound.Backend.Domain.Entities;
 
-namespace NorthSound.Domain.Interfaces;
+namespace NorthSound.Backend.Services.Abstractions;
 
 public interface ILibraryService
 {

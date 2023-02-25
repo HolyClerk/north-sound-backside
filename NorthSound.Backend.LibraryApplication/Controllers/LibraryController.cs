@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NorthSound.Domain.Entities;
-using NorthSound.Domain.Interfaces;
+using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.LibraryApplication.ViewModels;
+using NorthSound.Backend.Services.Abstractions;
 
 namespace NorthSound.Backend.LibraryApplication.Controllers;
 

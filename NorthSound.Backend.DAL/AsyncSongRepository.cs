@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NorthSound.Domain.Interfaces;
-using NorthSound.Domain.Entities;
+using NorthSound.Backend.DAL.Abstractions;
+using NorthSound.Backend.Domain.Entities;
 
-namespace NorthSound.Backend.Infrastructure.Data;
+namespace NorthSound.Backend.DAL;
 
 public class AsyncSongRepository : IAsyncSongRepository
 {
