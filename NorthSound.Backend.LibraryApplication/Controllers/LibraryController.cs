@@ -32,38 +32,35 @@ public class LibraryController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult> Get(int id)
     {
-        var response = await _library.GetSongStreamResultAsync(id);
+        var response = await _library.GetSongFileAsync(id);
 
         if (response.Status is not ResponseStatus.Success)
             return BadRequest();
 
-        return response.ResponseData;
+        return File(
+            response.ResponseData.FileStream, 
+            response.ResponseData.ContentType, 
+            response.ResponseData.Name);
     }
 
     // POST: api/songlibrary/
     [HttpPost]
-    public async Task<ActionResult> Post([FromForm] SongViewModel viewModel)
+    public async Task<ActionResult> Post(
+        [FromForm] SongViewModel viewModel, 
+        [FromServices] IStorageGenerator storage)
     {
         if (viewModel.Validate() is false)
             return BadRequest();
 
-        try
-        {
-            var mappedEntity = new Song()
-            {
-                Name = viewModel.Name,
-                Author = viewModel.Author,
-            };
+        var mappedEntity = viewModel.MapToSong();
 
-            Stream stream = viewModel.SongFile.OpenReadStream();
-            Song newEntity = await _library.CreateSongAsync(mappedEntity, stream);
-            return Ok(newEntity);
-        }
-        catch (Exception)
-        {
-            _logger.LogWarning("Bad request // Невозможно создать сущность в БД");
+        Stream stream = viewModel.SongFile.OpenReadStream();
+        var response = await _library.CreateSongAsync(mappedEntity, stream, storage);
+
+        if (response.Status is not ResponseStatus.Success)
             return BadRequest();
-        }
+
+        return Ok(response.ResponseData);
     }
 
     // DELETE: api/songlibrary/5
