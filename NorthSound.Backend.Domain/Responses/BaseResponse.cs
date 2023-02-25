@@ -12,5 +12,6 @@ public enum ResponseStatus
 {
     Success,
     NotFound,
-    BadRequest
+    BadRequest,
+    Failed
 }
