@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NorthSound.Backend.Domain.Entities;
+using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.LibraryApplication.ViewModels;
 using NorthSound.Backend.Services.Abstractions;
 
@@ -31,22 +32,12 @@ public class LibraryController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult> Get(int id)
     {
-        Song? entity = await _library.GetSongAsync(id);
+        var response = await _library.GetSongStreamResultAsync(id);
 
-        if (entity is null)
+        if (response.Status is not ResponseStatus.Success)
             return BadRequest();
 
-        try
-        {
-            var fileStream = _library.GetFileStream(entity);
-            return File(fileStream, ILibraryService.AudioContentType, $"{entity.Author} - {entity.Name}.mp3");
-        }
-        catch (Exception exception)
-        {
-            _logger.LogWarning("Ошибка в получении файла: id: {id}", id);
-            _logger.LogWarning("Вызвано исключение: {exception}", exception);
-            return NoContent();
-        }
+        return response.ResponseData;
     }
 
     // POST: api/songlibrary/
@@ -64,7 +55,7 @@ public class LibraryController : ControllerBase
                 Author = viewModel.Author,
             };
 
-            var stream = viewModel.SongFile.OpenReadStream();
+            Stream stream = viewModel.SongFile.OpenReadStream();
             Song newEntity = await _library.CreateSongAsync(mappedEntity, stream);
             return Ok(newEntity);
         }
@@ -73,19 +64,17 @@ public class LibraryController : ControllerBase
             _logger.LogWarning("Bad request // Невозможно создать сущность в БД");
             return BadRequest();
         }
-        
     }
 
     // DELETE: api/songlibrary/5
     [HttpDelete]
     public async Task<ActionResult> Delete(int id)
     {
-        Song? entity = await _library.GetSongAsync(id);
+        var isDeleted = await _library.DeleteAsync(id);
 
-        if (entity is null)
+        if (isDeleted is false)
             return BadRequest();
 
-        await _library.DeleteAsync(id);
-        return Ok(entity);
+        return Ok();
     }
 }

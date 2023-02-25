@@ -1,4 +1,4 @@
-﻿using NorthSound.Domain.Interfaces;
+﻿using NorthSound.Backend.Services.Abstractions;
 using System.ComponentModel.DataAnnotations;
 
 namespace NorthSound.Backend.LibraryApplication.ViewModels;
