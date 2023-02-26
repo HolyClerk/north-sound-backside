@@ -11,7 +11,7 @@ public class SongFile
         ContentType = contentType;
     }
 
-    public string Name { get; set; }
-    public FileStream FileStream { get; set; }
-    public string ContentType { get; set; }
+    public string Name { get; set; } = default!;
+    public FileStream FileStream { get; set; } = default!;
+    public string ContentType { get; set; } = default!;
 }
