@@ -2,7 +2,6 @@
 using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
-using System.Security.Cryptography;
 
 namespace NorthSound.Backend.Services;
 
