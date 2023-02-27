@@ -6,9 +6,9 @@ namespace NorthSound.Backend.DAL;
 
 public class AsyncSongRepository : IAsyncSongRepository
 {
-    private readonly SongContext _songContext;
+    private readonly ApplicationContext _songContext;
 
-    public AsyncSongRepository(SongContext songContext)
+    public AsyncSongRepository(ApplicationContext songContext)
     {
         _songContext = songContext;
     }

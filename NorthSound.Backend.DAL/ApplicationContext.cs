@@ -3,13 +3,14 @@ using NorthSound.Backend.Domain.Entities;
 
 namespace NorthSound.Backend.DAL;
 
-public class SongContext : DbContext
+public class ApplicationContext : DbContext
 {
-    public SongContext(DbContextOptions<SongContext> options)
+    public ApplicationContext(DbContextOptions<ApplicationContext> options)
         : base(options)
     {
-        Database.EnsureCreated();
+        // Database.EnsureCreated();
     }
 
     public DbSet<Song> Songs { get; set; }
+    public DbSet<User> Users { get; set; }
 }

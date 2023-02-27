@@ -1,10 +1,18 @@
-﻿using NorthSound.Backend.DAL.Abstractions;
+﻿using Microsoft.EntityFrameworkCore;
+using NorthSound.Backend.DAL.Abstractions;
 using NorthSound.Backend.Domain.Entities;
 
 namespace NorthSound.Backend.DAL;
 
 public class UserRepository : IUserRepository
 {
+    private readonly ApplicationContext _context;
+
+    public UserRepository(ApplicationContext context)
+    {
+        _context = context;
+    }
+
     public User CreateAsync(User entity)
     {
         throw new NotImplementedException();
@@ -15,9 +23,12 @@ public class UserRepository : IUserRepository
         throw new NotImplementedException();
     }
 
-    public Task<User?> GetUserAsync(string username, string password)
+    public async Task<User?> GetUserAsync(string username, string password)
     {
-        throw new NotImplementedException();
+        var user = await _context.Users
+            .FirstOrDefaultAsync(user => (user.Name == username) && (user.Password == password));
+
+        return user;
     }
 
     public IEnumerable<User> GetUsers()
