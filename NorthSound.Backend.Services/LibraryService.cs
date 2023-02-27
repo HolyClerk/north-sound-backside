@@ -24,9 +24,9 @@ public class LibraryService : ILibraryService
         return await _repository.GetSongAsync(id); 
     }
 
-    public async Task<BaseResponse<SongFile>> GetSongFileAsync(int id)
+    public async Task<ResponseBase<SongFile>> GetSongFileAsync(int id)
     {
-        var response = new BaseResponse<SongFile>();
+        var response = new ResponseBase<SongFile>();
         var entity = await _repository.GetSongAsync(id);
 
         if (entity is null)
@@ -46,9 +46,9 @@ public class LibraryService : ILibraryService
         return response;
     }
 
-    public async Task<BaseResponse<SongModel>> CreateSongAsync(Song entity, Stream stream, IStorageGenerator storage)
+    public async Task<ResponseBase<SongModel>> CreateSongAsync(Song entity, Stream stream, IStorageGenerator storage)
     {
-        var response = new BaseResponse<SongModel>();
+        var response = new ResponseBase<SongModel>();
         var pathToFile = storage.GenerateStoragePath();
 
         entity.Path = new Uri(pathToFile);

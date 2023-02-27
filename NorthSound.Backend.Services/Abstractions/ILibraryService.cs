@@ -11,7 +11,7 @@ public interface ILibraryService
 
     IEnumerable<Song> GetSongs();
     Task<Song?> GetSongAsync(int id);
-    Task<BaseResponse<SongFile>> GetSongFileAsync(int id);
-    Task<BaseResponse<SongModel>> CreateSongAsync(Song entity, Stream stream, IStorageGenerator storage);
+    Task<ResponseBase<SongFile>> GetSongFileAsync(int id);
+    Task<ResponseBase<SongModel>> CreateSongAsync(Song entity, Stream stream, IStorageGenerator storage);
     Task<bool> TryDeleteAsync(int id);
 }

@@ -16,9 +16,9 @@ public class UserService : IUserService
         _tokenHandler = tokenHandler;
     }
 
-    public async Task<BaseResponse<string>> AuthenticateAsync(string username, string password)
+    public async Task<ResponseBase<string>> AuthenticateAsync(string username, string password)
     {
-        var response = new BaseResponse<string>();
+        var response = new ResponseBase<string>();
         User? user = await _repository.GetUserAsync(username, password);
 
         if (user is null)
