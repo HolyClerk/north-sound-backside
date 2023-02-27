@@ -2,7 +2,7 @@
 
 namespace NorthSound.Backend.Domain.Responses;
 
-public class BaseResponse <T>
+public class ResponseBase <T>
 {
     public ResponseStatus Status { get; set; } 
     public T ResponseData { get; set; } = default!;

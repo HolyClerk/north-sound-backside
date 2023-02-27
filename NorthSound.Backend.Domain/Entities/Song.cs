@@ -4,7 +4,8 @@ namespace NorthSound.Backend.Domain.Entities;
 
 public class Song
 {
-    [Key] public int Id { get; set; } = default;
+    [Key] 
+    public int Id { get; set; } = default;
 
     [Required]
     [StringLength(100, MinimumLength = 1)]
@@ -16,4 +17,6 @@ public class Song
 
     [Required]
     public Uri Path { get; set; } = default!;
+
+    public User? Owner { get; set; }
 }
