@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.LibraryApplication.ViewModels;
@@ -11,20 +10,16 @@ namespace NorthSound.Backend.LibraryApplication.Controllers;
 [ApiController]
 public class LibraryController : ControllerBase
 {
-    private readonly ILogger<LibraryController> _logger;
     private readonly ILibraryService _library;
 
-    public LibraryController(
-        ILogger<LibraryController> logger,
-        ILibraryService libraryService)
+    public LibraryController(ILibraryService libraryService)
     {
-        _logger = logger;
         _library = libraryService;
     }
 
     // GET: api/library/
     [HttpGet]
-    public IEnumerable<Song> Get()
+    public IEnumerable<SongModel> Get()
     {
         return _library.GetSongs();
     }
@@ -33,15 +28,12 @@ public class LibraryController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult> Get(int id)
     {
-        var response = await _library.GetSongFileAsync(id);
+        var response = await _library.GetSongAsync(id);
 
         if (response.Status is not ResponseStatus.Success)
-            return BadRequest();
+            return BadRequest(response);
 
-        return File(
-            response.ResponseData.FileStream, 
-            response.ResponseData.ContentType, 
-            response.ResponseData.Name);
+        return Ok(response);
     }
 
     // POST: api/library/
@@ -59,7 +51,7 @@ public class LibraryController : ControllerBase
         var response = await _library.CreateSongAsync(mappedEntity, stream, storage);
 
         if (response.Status is not ResponseStatus.Success)
-            return BadRequest();
+            return BadRequest(response);
 
         return Ok(response.ResponseData);
     }
