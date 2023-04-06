@@ -20,14 +20,33 @@ public class LibraryService : ILibraryService
         _repository = repository;
     }
 
-    public IEnumerable<Song> GetSongs() 
+    public IEnumerable<SongModel> GetSongs() 
     {
-        return _repository.GetSongs();
+        var songs = _repository.GetSongs();
+        var songModels = new List<SongModel>();
+
+        foreach (var song in songs)
+        {
+            songModels.Add(new SongModel(song));
+        }
+
+        return songModels;
     }
 
-    public async Task<Song?> GetSongAsync(int id)
+    public async Task<GenericResponse<SongModel>> GetSongAsync(int id)
     {
-        return await _repository.GetSongAsync(id); 
+        var response = new GenericResponse<SongModel>();
+        var entity = await _repository.GetSongAsync(id);
+
+        if (entity is null)
+        {
+            response.Status = ResponseStatus.NotFound;
+            return response;
+        }
+
+        response.Status = ResponseStatus.Success;
+        response.ResponseData = new SongModel(entity);
+        return response; 
     }
 
     public async Task<GenericResponse<SongFile>> GetSongFileAsync(int id)

@@ -9,8 +9,8 @@ public interface ILibraryService
     public const int MinSizeOfFile = 20971;
     public const string AudioContentType = "audio/mpeg";
 
-    IEnumerable<Song> GetSongs();
-    Task<Song?> GetSongAsync(int id);
+    IEnumerable<SongModel> GetSongs();
+    Task<GenericResponse<SongModel>> GetSongAsync(int id);
     Task<GenericResponse<SongFile>> GetSongFileAsync(int id);
     Task<GenericResponse<SongModel>> CreateSongAsync(Song entity, Stream stream, IStorageGenerator storage);
     Task<bool> TryDeleteAsync(int id);
