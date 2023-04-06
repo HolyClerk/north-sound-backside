@@ -6,6 +6,7 @@
 # North Sound
 NorthSound.Checks/
 NorthSound.Tests/
+NorthSound.Backend.Infrastructure/
 [Aa]ppsettings.*
 
 # Build results
