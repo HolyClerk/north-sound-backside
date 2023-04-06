@@ -5,7 +5,7 @@ namespace NorthSound.Backend.Infrastructure;
 
 public class StorageGenerator : IStorageGenerator
 {
-    public string GenerateStoragePath()
+    public string GetNewGeneratedPath()
     {
         string generatedName = RandomNumberGenerator
             .GetInt32(-2_147_483_640, 2_147_483_640)

@@ -23,10 +23,10 @@ public class UserRepository : IUserRepository
         throw new NotImplementedException();
     }
 
-    public async Task<User?> GetUserAsync(string username, string password)
+    public async Task<User?> GetUserByNameAsync(string username)
     {
         var user = await _context.Users
-            .FirstOrDefaultAsync(user => (user.Name == username) && (user.Password == password));
+            .FirstOrDefaultAsync(user => user.Name == username);
 
         return user;
     }

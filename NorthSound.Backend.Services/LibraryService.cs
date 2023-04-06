@@ -5,6 +5,12 @@ using NorthSound.Backend.Services.Abstractions;
 
 namespace NorthSound.Backend.Services;
 
+/// <summary>
+/// Этот сервис работает напрямую с хранилищем аудио файлов и БД.
+/// LS предоставляет функционал для получения, удаления и создания
+/// новых энтитей в БД и привязке этих записей к реальным файлам, 
+/// абстрагируя клиента от внутренней работы кухни.
+/// </summary>
 public class LibraryService : ILibraryService
 {
     private readonly IAsyncSongRepository _repository;
@@ -24,9 +30,9 @@ public class LibraryService : ILibraryService
         return await _repository.GetSongAsync(id); 
     }
 
-    public async Task<ResponseBase<SongFile>> GetSongFileAsync(int id)
+    public async Task<GenericResponse<SongFile>> GetSongFileAsync(int id)
     {
-        var response = new ResponseBase<SongFile>();
+        var response = new GenericResponse<SongFile>();
         var entity = await _repository.GetSongAsync(id);
 
         if (entity is null)
@@ -46,13 +52,22 @@ public class LibraryService : ILibraryService
         return response;
     }
 
-    public async Task<ResponseBase<SongModel>> CreateSongAsync(Song entity, Stream stream, IStorageGenerator storage)
+    /// <summary>
+    /// Метод для создания модели в базе данных и сохранения
+    /// ее данных (аудио-файла) в хранилище.
+    /// </summary>
+    public async Task<GenericResponse<SongModel>> CreateSongAsync(
+        Song entity, 
+        Stream stream, 
+        IStorageGenerator storage)
     {
-        var response = new ResponseBase<SongModel>();
-        var pathToFile = storage.GenerateStoragePath();
+        var response = new GenericResponse<SongModel>();
+        // Случайный путь к файлу
+        var pathToFile = storage.GetNewGeneratedPath();
 
         entity.Path = new Uri(pathToFile);
-        Task copyTask = CopyStreamAsync(stream, pathToFile);  // Копируем трек в хранилище
+        // Запускаем задачу на копирование файла (открытого потока) в хранилище
+        Task copyTask = CopyStreamToFileAsync(stream, pathToFile);  
 
         try
         {
@@ -84,7 +99,7 @@ public class LibraryService : ILibraryService
         return true;
     }
 
-    private async Task CopyStreamAsync(Stream stream, string pathToCopy)
+    private async Task CopyStreamToFileAsync(Stream stream, string pathToCopy)
     {
         using (var fileStream = new FileStream(pathToCopy, FileMode.Create))
         {

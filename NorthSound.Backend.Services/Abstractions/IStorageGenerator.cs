@@ -6,5 +6,5 @@ public interface IStorageGenerator
     /// Генерирует путь файла к хранилищу
     /// </summary>
     /// <returns>Строка в формате "disk:/storage/file"</returns>
-    string GenerateStoragePath();
+    string GetNewGeneratedPath();
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.LibraryApplication.ViewModels;
@@ -21,14 +22,14 @@ public class LibraryController : ControllerBase
         _library = libraryService;
     }
 
-    // GET: api/songlibrary/
+    // GET: api/library/
     [HttpGet]
     public IEnumerable<Song> Get()
     {
         return _library.GetSongs();
     }
 
-    // GET: api/songlibrary/5
+    // GET: api/library/5
     [HttpGet("{id}")]
     public async Task<ActionResult> Get(int id)
     {
@@ -43,17 +44,17 @@ public class LibraryController : ControllerBase
             response.ResponseData.Name);
     }
 
-    // POST: api/songlibrary/
+    // POST: api/library/
     [HttpPost]
     public async Task<ActionResult> Post(
         [FromForm] SongViewModel viewModel, 
         [FromServices] IStorageGenerator storage)
     {
-        if (viewModel.Validate() is false)
-            return BadRequest();
+        Song mappedEntity = viewModel.MapToSong();
 
-        var mappedEntity = viewModel.MapToSong();
-
+        // На основе данных из вьюмодели (файла) создается и
+        // открывается поток для чтения, для будущей записи на хранилище
+        // и в БД.
         Stream stream = viewModel.SongFile.OpenReadStream();
         var response = await _library.CreateSongAsync(mappedEntity, stream, storage);
 
@@ -63,7 +64,7 @@ public class LibraryController : ControllerBase
         return Ok(response.ResponseData);
     }
 
-    // DELETE: api/songlibrary/5
+    // DELETE: api/library/5
     [HttpDelete]
     public async Task<ActionResult> Delete(int id)
     {

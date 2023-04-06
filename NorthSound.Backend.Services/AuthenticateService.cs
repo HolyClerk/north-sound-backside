@@ -5,23 +5,25 @@ using NorthSound.Backend.Services.Abstractions;
 
 namespace NorthSound.Backend.Services;
 
-public class UserService : IUserService
+public class AuthenticateService : IAuthenticateService
 {
     private readonly ITokenHandler _tokenHandler;
     private readonly IUserRepository _repository;
 
-    public UserService(IUserRepository userRepository, ITokenHandler tokenHandler)
+    public AuthenticateService(
+        IUserRepository userRepository, 
+        ITokenHandler tokenHandler)
     {
         _repository = userRepository;
         _tokenHandler = tokenHandler;
     }
 
-    public async Task<ResponseBase<string>> AuthenticateAsync(string username, string password)
+    public async Task<GenericResponse<string>> AuthenticateAsync(string username, string password)
     {
-        var response = new ResponseBase<string>();
-        User? user = await _repository.GetUserAsync(username, password);
+        var response = new GenericResponse<string>();
+        User? user = await _repository.GetUserByNameAsync(username);
 
-        if (user is null)
+        if (user is null || user.Password != password)
         {
             response.Status = ResponseStatus.NotFound; 
             return response;

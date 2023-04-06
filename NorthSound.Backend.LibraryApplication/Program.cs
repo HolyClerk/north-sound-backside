@@ -34,12 +34,12 @@ public class Program
         ConnectDatabase(builder);
 
         builder.Services
-            .AddTransient<IStorageGenerator, StorageGenerator>()    // Класс, необходимый для создания путей
-            .AddTransient<ITokenHandler, JwtTokenGenerator>()       // Сервис работы с токенами
-            .AddScoped<IAsyncSongRepository, AsyncSongRepository>() // Репозиторий музыки
-            .AddScoped<ILibraryService, LibraryService>()           // Сервис, работающий с репо музыки
-            .AddScoped<IUserRepository, UserRepository>()           // Репо пользователей
-            .AddScoped<IUserService, UserService>();                // Сервис, работающий с авторизацией пользователей
+            .AddTransient<IStorageGenerator, StorageGenerator>()        // Класс, необходимый для создания путей
+            .AddTransient<ITokenHandler, JwtTokenGenerator>()           // Сервис работы с токенами
+            .AddScoped<IAsyncSongRepository, AsyncSongRepository>()     // Репозиторий музыки
+            .AddScoped<ILibraryService, LibraryService>()               // Сервис, работающий с репо музыки
+            .AddScoped<IUserRepository, UserRepository>()               // Репо пользователей
+            .AddScoped<IAuthenticateService, AuthenticateService>();    // Сервис, работающий с авторизацией пользователей
 
         var app = builder.Build();
 

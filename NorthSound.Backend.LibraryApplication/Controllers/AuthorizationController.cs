@@ -9,10 +9,10 @@ namespace NorthSound.Backend.LibraryApplication.Controllers;
 [ApiController]
 public class AuthorizationController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IAuthenticateService _userService;
 
     public AuthorizationController(
-        IUserService userService)
+        IAuthenticateService userService)
     {
         _userService = userService;
     }
