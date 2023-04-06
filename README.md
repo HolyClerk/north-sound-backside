@@ -1,1 +1,1 @@
-# north-sound-backside
+# Бэкенд для приложения "North Sound"
