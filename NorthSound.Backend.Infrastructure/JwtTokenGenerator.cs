@@ -24,7 +24,7 @@ public class JwtTokenGenerator : ITokenHandler
     }
 
     /// <summary>
-    /// Генерирует и возвращает JWT-токен на основе модели пользователя
+    /// Генерирует и возвращает JWT-токен на основе модели пользователя //////
     /// </summary>
     /// <returns>JWT токен</returns>
     public string GenerateToken(User user)

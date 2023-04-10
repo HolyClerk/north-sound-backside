@@ -28,12 +28,15 @@ public class LibraryController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult> Get(int id)
     {
-        var response = await _library.GetSongAsync(id);
+        var response = await _library.GetSongFileAsync(id);
 
         if (response.Status is not ResponseStatus.Success)
             return BadRequest(response);
 
-        return Ok(response);
+        return File(
+            response.ResponseData.FileStream,
+            response.ResponseData.ContentType,
+            response.ResponseData.Name);
     }
 
     // POST: api/library/
