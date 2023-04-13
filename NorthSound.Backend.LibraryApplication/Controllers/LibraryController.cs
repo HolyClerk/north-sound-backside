@@ -34,9 +34,9 @@ public class LibraryController : ControllerBase
             return BadRequest(response);
 
         return File(
-            response.ResponseData.FileStream,
-            response.ResponseData.ContentType,
-            response.ResponseData.Name);
+            response.Data.FileStream,
+            response.Data.ContentType,
+            response.Data.Name);
     }
 
     // POST: api/library/
@@ -56,7 +56,7 @@ public class LibraryController : ControllerBase
         if (response.Status is not ResponseStatus.Success)
             return BadRequest(response);
 
-        return Ok(response.ResponseData);
+        return Ok(response.Data);
     }
 
     // DELETE: api/library/5

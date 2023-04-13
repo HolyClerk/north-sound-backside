@@ -26,6 +26,6 @@ public class AuthorizationController : ControllerBase
         if (response.Status is not ResponseStatus.Success)
             return ValidationProblem();
 
-        return Ok(response.ResponseData);
+        return Ok(response.Data);
     }
 }

@@ -45,7 +45,7 @@ public class LibraryService : ILibraryService
         }
 
         response.Status = ResponseStatus.Success;
-        response.ResponseData = new SongModel(entity);
+        response.Data = new SongModel(entity);
         return response; 
     }
 
@@ -61,7 +61,7 @@ public class LibraryService : ILibraryService
         }
 
         response.Status = ResponseStatus.Success;
-        response.ResponseData = new SongFile()
+        response.Data = new SongFile()
         {
             Name = $"{entity.Author} - {entity.Name}",
             FileStream = new FileStream(entity.Path.AbsolutePath, FileMode.Open),
@@ -95,7 +95,7 @@ public class LibraryService : ILibraryService
             await copyTask;
 
             response.Status = ResponseStatus.Success;
-            response.ResponseData = new SongModel(entity);
+            response.Data = new SongModel(entity);
 
             return response;
         }

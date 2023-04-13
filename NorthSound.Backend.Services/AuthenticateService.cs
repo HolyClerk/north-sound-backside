@@ -32,7 +32,7 @@ public class AuthenticateService : IAuthenticateService
         var token = _tokenHandler.GenerateToken(user);
 
         response.Status = ResponseStatus.Success;
-        response.ResponseData = token;
+        response.Data = token;
         return response;
     }
 }

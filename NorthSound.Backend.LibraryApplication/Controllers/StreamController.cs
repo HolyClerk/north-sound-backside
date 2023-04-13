@@ -25,7 +25,7 @@ public class StreamController : ControllerBase
             return BadRequest();
 
         return File(
-            response.ResponseData.FileStream,
+            response.Data.FileStream,
             "audio/mpeg");
     }
 }
