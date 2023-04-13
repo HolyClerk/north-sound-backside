@@ -71,10 +71,6 @@ public class LibraryService : ILibraryService
         return response;
     }
 
-    /// <summary>
-    /// Метод для создания модели в базе данных и сохранения
-    /// ее данных (аудио-файла) в хранилище.
-    /// </summary>
     public async Task<GenericResponse<SongModel>> CreateSongAsync(
         Song entity, 
         Stream stream, 
