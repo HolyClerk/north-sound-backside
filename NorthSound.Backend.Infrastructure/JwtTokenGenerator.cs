@@ -1,4 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Services.Abstractions;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,22 +11,20 @@ namespace NorthSound.Backend.Infrastructure;
 
 public class JwtTokenGenerator : ITokenHandler
 {
-    private const int TokenLifetimeInMinutes = 120; // 2 часа
+    private readonly IConfiguration _configuration;
 
-    public const string Issuer = "https://localhost:7099";
-    public const string Audience = "https://localhost:7099";
+    public const int TokenLifetime = 60; // 1 час
 
-    public SymmetricSecurityKey SecurityKey
+    public const string Issuer = "https://localhost:7125";
+    public const string Audience = "https://localhost:7125";
+
+    public JwtTokenGenerator(IConfiguration configuration)
     {
-        get
-        {
-            byte[] key = Encoding.UTF8.GetBytes(GetSecretKey());
-            return new SymmetricSecurityKey(key);
-        }
+        _configuration = configuration;
     }
 
     /// <summary>
-    /// Генерирует и возвращает JWT-токен на основе модели пользователя //////
+    /// Генерирует и возвращает JWT-токен на основе модели пользователя
     /// </summary>
     /// <returns>JWT токен</returns>
     public string GenerateToken(User user)
@@ -35,22 +35,23 @@ public class JwtTokenGenerator : ITokenHandler
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
         };
 
-        
-        var credentials = new SigningCredentials(SecurityKey, SecurityAlgorithms.HmacSha256);
+        var credentials = new SigningCredentials(GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
             issuer:             Issuer, 
             audience:           Audience, 
             claims:             claims,
             notBefore:          DateTime.Now,
-            expires:            DateTime.Now.AddMinutes(TokenLifetimeInMinutes),
+            expires:            DateTime.Now.AddSeconds(TokenLifetime),
             signingCredentials: credentials
         );
 
-        string tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
-        return tokenValue;
+        return new JwtSecurityTokenHandler().WriteToken(token); 
     }
 
-    private string GetSecretKey()
-        => "my_test_secret_key";
+    public SymmetricSecurityKey GetSymmetricSecurityKey()
+    {
+        byte[] key = Encoding.ASCII.GetBytes(_configuration["Secret"]!);
+        return new SymmetricSecurityKey(key);
+    }
 }
