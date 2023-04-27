@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services;
 using NorthSound.Backend.Services.Abstractions;
@@ -26,6 +27,13 @@ public class AuthorizationController : ControllerBase
         if (response.Status is not ResponseStatus.Success)
             return ValidationProblem();
 
-        return Ok(response.Data);
+        return Ok(response.Data.Token);
+    }
+
+    [HttpGet("secret")]
+    [Authorize]
+    public async Task<ActionResult> Get()
+    {
+        return Ok("Ok");
     }
 }

@@ -5,6 +5,7 @@ using NorthSound.Backend.DAL;
 using NorthSound.Backend.Services;
 using NorthSound.Backend.Services.Abstractions;
 using NorthSound.Backend.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 void ConnectDatabase(WebApplicationBuilder builder)
 {
@@ -22,13 +23,26 @@ builder.Services
     .AddAuthentication("OAuth")
     .AddJwtBearer("OAuth", config =>
     {
-        var tokenGen = new JwtTokenGenerator();
+        var tokenGen = new JwtTokenGenerator(builder.Configuration);
+        var key = tokenGen.GetSymmetricSecurityKey();
+
+        config.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                if (context.Request.Query.ContainsKey("t"))
+                    context.Token = context.Request.Query["t"];
+
+                return Task.CompletedTask;
+            }
+        };
 
         config.TokenValidationParameters = new TokenValidationParameters()
         {
+            ValidateAudience = false,
             ValidIssuer = JwtTokenGenerator.Issuer,
             ValidAudience = JwtTokenGenerator.Audience,
-            IssuerSigningKey = tokenGen.SecurityKey
+            IssuerSigningKey = key
         };
     });
 
@@ -40,7 +54,7 @@ ConnectDatabase(builder);
 
 builder.Services
     .AddTransient<IStorageGenerator, StorageGenerator>()        // Класс, необходимый для создания путей
-    .AddTransient<ITokenHandler, JwtTokenGenerator>()           // Сервис работы с токенами
+    .AddTransient<ITokenHandler, JwtTokenGenerator>()           // Сервис работы с JWT токенами
     .AddScoped<IAsyncSongRepository, AsyncSongRepository>()     // Репозиторий музыки
     .AddScoped<ILibraryService, LibraryService>()               // Сервис, работающий с репо музыки
     .AddScoped<IUserRepository, UserRepository>()               // Репо пользователей
@@ -57,8 +71,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
