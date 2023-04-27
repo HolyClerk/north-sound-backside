@@ -23,7 +23,7 @@ public class UserRepository : IUserRepository
         throw new NotImplementedException();
     }
 
-    public async Task<User?> GetUserByNameAsync(string username)
+    public async Task<User?> GetByNameAsync(string username)
     {
         var user = await _context.Users
             .FirstOrDefaultAsync(user => user.Name == username);
@@ -31,7 +31,7 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public IEnumerable<User> GetUsers()
+    public IEnumerable<User> Get()
     {
         throw new NotImplementedException();
     }
@@ -44,5 +44,9 @@ public class UserRepository : IUserRepository
     public User UpdateAsync(User entity)
     {
         throw new NotImplementedException();
+
     }
+
+    public async Task<User?> GetById(int id)
+        => await _context.Users.FirstOrDefaultAsync(user => user.Id == id);
 }
