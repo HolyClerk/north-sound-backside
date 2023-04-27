@@ -7,11 +7,3 @@ public class GenericResponse <T>
     public ResponseStatus Status { get; set; } 
     public T Data { get; set; } = default!;
 }
-
-public enum ResponseStatus
-{
-    Success,
-    NotFound,
-    BadRequest,
-    Failed
-}
