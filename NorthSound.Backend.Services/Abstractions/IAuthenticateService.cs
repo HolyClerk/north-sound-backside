@@ -4,5 +4,5 @@ namespace NorthSound.Backend.Services.Abstractions;
 
 public interface IAuthenticateService
 {
-    Task<GenericResponse<string>> AuthenticateAsync(string username, string password);
+    Task<GenericResponse<AuthenticateResponse>> AuthenticateAsync(string username, string password);
 }

@@ -18,21 +18,23 @@ public class AuthenticateService : IAuthenticateService
         _tokenHandler = tokenHandler;
     }
 
-    public async Task<GenericResponse<string>> AuthenticateAsync(string username, string password)
+    public async Task<GenericResponse<AuthenticateResponse>> AuthenticateAsync(string username, string password)
     {
-        var response = new GenericResponse<string>();
-        User? user = await _repository.GetUserByNameAsync(username);
+        var entity = await _repository.GetByNameAsync(username);
 
-        if (user is null || user.Password != password)
-        {
-            response.Status = ResponseStatus.NotFound; 
-            return response;
-        }
+        if (entity is not User user)
+            return new GenericResponse<AuthenticateResponse>() { Status = ResponseStatus.NotFound };
 
+        if (!user.Password.Equals(password))
+            return new GenericResponse<AuthenticateResponse>() { Status = ResponseStatus.NotFound };
+
+        // todo: get token
         var token = _tokenHandler.GenerateToken(user);
 
-        response.Status = ResponseStatus.Success;
-        response.Data = token;
-        return response;
+        return new GenericResponse<AuthenticateResponse>()
+        {
+            Data = new AuthenticateResponse(user, token),
+            Status = ResponseStatus.Success
+        };
     }
 }
