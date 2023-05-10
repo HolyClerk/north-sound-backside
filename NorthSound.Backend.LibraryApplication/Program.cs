@@ -42,7 +42,7 @@ builder.Services
             ValidateAudience = false,
             ValidIssuer = JwtTokenGenerator.Issuer,
             ValidAudience = JwtTokenGenerator.Audience,
-            IssuerSigningKey = key
+            IssuerSigningKey = key,
         };
     });
 
@@ -57,8 +57,7 @@ builder.Services
     .AddTransient<ITokenHandler, JwtTokenGenerator>()           // Сервис работы с JWT токенами
     .AddScoped<IAsyncSongRepository, AsyncSongRepository>()     // Репозиторий музыки
     .AddScoped<ILibraryService, LibraryService>()               // Сервис, работающий с репо музыки
-    .AddScoped<IUserRepository, UserRepository>()               // Репо пользователей
-    .AddScoped<IAuthenticateService, AuthenticateService>();    // Сервис, работающий с авторизацией пользователей
+    .AddScoped<IAccountService, AccountService>();    // Сервис, работающий с авторизацией пользователей
 
 var app = builder.Build();
 
