@@ -26,21 +26,17 @@ public class AccountService : IAccountService
         var findedUser = await _context.Users.FirstOrDefaultAsync(x => x.Name == request.Username);
 
         if (findedUser is not null)
-            return new GenericResponse<AuthenticateResponse>().Failed("Такой пользователь уже существует");
+            return GenericResponse<AuthenticateResponse>.Failed("Такой пользователь уже существует");
 
         if (request.Password.Length < 6)
-            return new GenericResponse<AuthenticateResponse>().Failed("Пароль должен содержать не менее 6 символов");
+            return GenericResponse<AuthenticateResponse>.Failed("Пароль должен содержать не менее 6 символов");
 
         var newUser = request.MapToUser();
         var token = _tokenHandler.GenerateToken(newUser);
 
         await CreateUserAsync(newUser);
 
-        return new GenericResponse<AuthenticateResponse>()
-        {
-            Data = new AuthenticateResponse(newUser, token),
-            Status = ResponseStatus.Success
-        };
+        return GenericResponse<AuthenticateResponse>.Success(new AuthenticateResponse(newUser, token));
     }
 
     public async Task<GenericResponse<AuthenticateResponse>> LoginAsync(AuthenticateRequest request)
@@ -48,15 +44,11 @@ public class AccountService : IAccountService
         var entity = await _context.Users.FirstOrDefaultAsync(x => x.Name == request.Username);
 
         if ((entity is not User user) || (!user.Password.Equals(request.Password)))
-            return new GenericResponse<AuthenticateResponse>().Failed("Такого пользователя не существует");
+            return GenericResponse<AuthenticateResponse>.Failed("Такого пользователя не существует");
 
         var token = _tokenHandler.GenerateToken(user);
 
-        return new GenericResponse<AuthenticateResponse>()
-        {
-            Data = new AuthenticateResponse(user, token),
-            Status = ResponseStatus.Success
-        };
+        return GenericResponse<AuthenticateResponse>.Success(new AuthenticateResponse(user, token));
     }
 
     private async Task CreateUserAsync(User newUser)

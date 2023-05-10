@@ -6,6 +6,7 @@ using NorthSound.Backend.Services;
 using NorthSound.Backend.Services.Abstractions;
 using NorthSound.Backend.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 void ConnectDatabase(WebApplicationBuilder builder)
 {
@@ -51,13 +52,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 ConnectDatabase(builder);
-
+\
 builder.Services
     .AddTransient<IStorageGenerator, StorageGenerator>()        // Класс, необходимый для создания путей
     .AddTransient<ITokenHandler, JwtTokenGenerator>()           // Сервис работы с JWT токенами
     .AddScoped<IAsyncSongRepository, AsyncSongRepository>()     // Репозиторий музыки
     .AddScoped<ILibraryService, LibraryService>()               // Сервис, работающий с репо музыки
-    .AddScoped<IAccountService, AccountService>();    // Сервис, работающий с авторизацией пользователей
+    .AddScoped<IAccountService, AccountService>();              // Сервис, работающий с авторизацией пользователей
 
 var app = builder.Build();
 

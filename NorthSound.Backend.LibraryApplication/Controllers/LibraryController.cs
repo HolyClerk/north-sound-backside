@@ -34,7 +34,7 @@ public class LibraryController : ControllerBase
             return BadRequest(response);
 
         return File(
-            response.Data.FileStream,
+            response.Data!.FileStream,
             response.Data.ContentType,
             response.Data.Name);
     }
