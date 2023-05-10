@@ -10,18 +10,22 @@ public class GenericResponse <T>
 
     public string? Details { get; set; } 
 
-    public GenericResponse<T> Failed(string details)
+    public static GenericResponse<T> Failed(string details, ResponseStatus responseStatus = ResponseStatus.Failed)
     {
-        Details = details;
-        Status = ResponseStatus.Failed;
-        return this;
+        return new GenericResponse<T>() 
+        {
+            Details = details,
+            Status = responseStatus,
+        };
     }
     
-    public GenericResponse<T> Success(T data, string? details = null)
+    public static GenericResponse<T> Success(T data, string? details = null)
     {
-        Data = data;
-        Details = details;
-        Status = ResponseStatus.Success;
-        return this;
+        return new GenericResponse<T>()
+        {
+            Data = data,
+            Details = details,
+            Status = ResponseStatus.Success,
+        };
     }
 }
