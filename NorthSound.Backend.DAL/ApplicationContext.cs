@@ -10,9 +10,11 @@ public class ApplicationContext : DbContext
     public ApplicationContext(DbContextOptions<ApplicationContext> options)
         : base(options)
     {
-        // Database.EnsureCreated();
+        Database.EnsureCreated();
     }
 
     public DbSet<SongDTO> Songs { get; set; }
     public DbSet<UserDTO> Users { get; set; }
+    public DbSet<MessageDTO> Messages { get; set; }
+    public DbSet<DialogueDTO> Dialogues { get; set; }
 }
