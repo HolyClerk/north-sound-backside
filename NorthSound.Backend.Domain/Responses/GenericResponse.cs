@@ -16,4 +16,12 @@ public class GenericResponse <T>
         Status = ResponseStatus.Failed;
         return this;
     }
+    
+    public GenericResponse<T> Success(T data, string? details = null)
+    {
+        Data = data;
+        Details = details;
+        Status = ResponseStatus.Success;
+        return this;
+    }
 }
