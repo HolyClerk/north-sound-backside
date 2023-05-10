@@ -21,5 +21,7 @@ public class UserDTO
     [StringLength(100, MinimumLength = 6)]
     public string Password { get; set; } = default!;
 
+    [Required] public DateTime CreatedAt { get; set; } = default!;
+
     public List<SongDTO> Songs { get; set; } = new();
 }
