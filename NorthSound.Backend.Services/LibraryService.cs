@@ -35,40 +35,29 @@ public class LibraryService : ILibraryService
 
     public async Task<GenericResponse<SongModel>> GetSongAsync(int id)
     {
-        var response = new GenericResponse<SongModel>();
         var entity = await _repository.GetSongAsync(id);
 
         if (entity is null)
-        {
-            response.Status = ResponseStatus.NotFound;
-            return response;
-        }
+            return GenericResponse<SongModel>.Failed("Не найдено", ResponseStatus.NotFound);
 
-        response.Status = ResponseStatus.Success;
-        response.Data = new SongModel(entity);
-        return response; 
+        return GenericResponse<SongModel>.Success(new SongModel(entity)); 
     }
 
     public async Task<GenericResponse<SongFile>> GetSongFileAsync(int id)
     {
-        var response = new GenericResponse<SongFile>();
         var entity = await _repository.GetSongAsync(id);
 
         if (entity is null)
-        {
-            response.Status = ResponseStatus.NotFound;
-            return response;
-        }
+            return GenericResponse<SongFile>.Failed("Не найдено", ResponseStatus.NotFound);
 
-        response.Status = ResponseStatus.Success;
-        response.Data = new SongFile()
+        var data = new SongFile()
         {
             Name = $"{entity.Author} - {entity.Name}",
             FileStream = new FileStream(entity.Path.AbsolutePath, FileMode.Open),
             ContentType = ILibraryService.AudioContentType,
         };
 
-        return response;
+        return GenericResponse<SongFile>.Success(data);
     }
 
     public async Task<GenericResponse<SongModel>> CreateSongAsync(
@@ -76,10 +65,8 @@ public class LibraryService : ILibraryService
         Stream stream, 
         IStorageGenerator storage)
     {
-        var response = new GenericResponse<SongModel>();
         // Случайный путь к файлу
         var pathToFile = storage.GetNewGeneratedPath();
-
         entity.Path = new Uri(pathToFile);
         // Запускаем задачу на копирование файла (открытого потока) в хранилище
         Task copyTask = CopyStreamToFileAsync(stream, pathToFile);  
@@ -90,15 +77,11 @@ public class LibraryService : ILibraryService
             await _repository.SaveAsync();
             await copyTask;
 
-            response.Status = ResponseStatus.Success;
-            response.Data = new SongModel(entity);
-
-            return response;
+            return GenericResponse<SongModel>.Success(new SongModel(entity));
         }
         catch (Exception)
         {
-            response.Status = ResponseStatus.Failed;
-            return response;
+            return GenericResponse<SongModel>.Failed("Неизвестная ошибка");
         }
     }
 
