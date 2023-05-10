@@ -11,7 +11,6 @@ public class User
     public string Name { get; set; } = default!;
 
     [Required]
-    [StringLength(100, MinimumLength = 6)]
     [RegularExpression(@"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$")]
     public string Email { get; set; } = default!;
 
