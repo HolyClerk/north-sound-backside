@@ -27,7 +27,7 @@ public class JwtTokenGenerator : ITokenHandler
     /// Генерирует и возвращает JWT-токен на основе модели пользователя
     /// </summary>
     /// <returns>JWT токен</returns>
-    public string GenerateToken(User user)
+    public string GenerateToken(UserDTO user)
     {
         var claims = new List<Claim>()
         {
@@ -42,7 +42,7 @@ public class JwtTokenGenerator : ITokenHandler
             audience:           Audience, 
             claims:             claims,
             notBefore:          DateTime.Now,
-            expires:            DateTime.Now.AddSeconds(TokenLifetime),
+            expires:            DateTime.Now.AddSeconds(60),
             signingCredentials: credentials
         );
 

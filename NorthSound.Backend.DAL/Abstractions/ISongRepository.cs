@@ -1,13 +1,13 @@
-﻿using NorthSound.Backend.Domain.Entities;
+﻿using NorthSound.Backend.Domain.SongEntities;
 
 namespace NorthSound.Backend.DAL.Abstractions;
 
 public interface ISongRepository : IDisposable
 {
-    IEnumerable<Song> GetSongs();
-    Song GetSong(int id);
-    void Create(Song entity);
-    void Update(Song entity);
+    IEnumerable<SongDTO> GetSongs();
+    SongDTO GetSong(int id);
+    void Create(SongDTO entity);
+    void Update(SongDTO entity);
     void Delete(int id);
     void Save();
 }

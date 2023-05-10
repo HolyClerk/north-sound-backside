@@ -4,5 +4,5 @@ namespace NorthSound.Backend.Services.Abstractions;
 
 public interface ITokenHandler
 {
-    string GenerateToken(User user);
+    string GenerateToken(UserDTO user);
 }

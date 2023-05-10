@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NorthSound.Backend.Domain.Entities;
+using NorthSound.Backend.Domain.SongEntities;
 using System.Collections.Generic;
 
 namespace NorthSound.Backend.DAL;
@@ -12,6 +13,6 @@ public class ApplicationContext : DbContext
         // Database.EnsureCreated();
     }
 
-    public DbSet<Song> Songs { get; set; }
-    public DbSet<User> Users { get; set; }
+    public DbSet<SongDTO> Songs { get; set; }
+    public DbSet<UserDTO> Users { get; set; }
 }

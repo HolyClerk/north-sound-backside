@@ -1,5 +1,5 @@
 ﻿using NorthSound.Backend.DAL.Abstractions;
-using NorthSound.Backend.Domain.Entities;
+using NorthSound.Backend.Domain.SongEntities;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
 
@@ -61,7 +61,7 @@ public class LibraryService : ILibraryService
     }
 
     public async Task<GenericResponse<SongModel>> CreateSongAsync(
-        Song entity, 
+        SongDTO entity, 
         Stream stream, 
         IStorageGenerator storage)
     {
@@ -87,7 +87,7 @@ public class LibraryService : ILibraryService
 
     public async Task<bool> TryDeleteAsync(int id)
     {
-        Song? entity = await _repository.GetSongAsync(id);
+        SongDTO? entity = await _repository.GetSongAsync(id);
 
         if (entity is null)
             return false;
@@ -97,7 +97,7 @@ public class LibraryService : ILibraryService
         return true;
     }
 
-    private async Task CopyStreamToFileAsync(Stream stream, string pathToCopy)
+    private static async Task CopyStreamToFileAsync(Stream stream, string pathToCopy)
     {
         using (var fileStream = new FileStream(pathToCopy, FileMode.Create))
         {

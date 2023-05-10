@@ -1,4 +1,4 @@
-﻿using NorthSound.Backend.Domain.Entities;
+﻿using NorthSound.Backend.Domain.SongEntities;
 using NorthSound.Backend.Services.Abstractions;
 using System.ComponentModel.DataAnnotations;
 
@@ -20,9 +20,9 @@ public class SongViewModel
             (this.SongFile.ContentType is ILibraryService.AudioContentType);
     }
 
-    public Song MapToSong()
+    public SongDTO MapToSong()
     {
-        return new Song()
+        return new SongDTO()
         {
             Name = this.Name,
             Author = this.Author,

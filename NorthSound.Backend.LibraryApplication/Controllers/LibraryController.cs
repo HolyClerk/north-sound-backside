@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NorthSound.Backend.Domain.Entities;
+using NorthSound.Backend.Domain.SongEntities;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.LibraryApplication.ViewModels;
 using NorthSound.Backend.Services.Abstractions;
@@ -45,7 +45,7 @@ public class LibraryController : ControllerBase
         [FromForm] SongViewModel viewModel, 
         [FromServices] IStorageGenerator storage)
     {
-        Song mappedEntity = viewModel.MapToSong();
+        SongDTO mappedEntity = viewModel.MapToSong();
 
         // На основе данных из вьюмодели (файла) создается и
         // открывается поток для чтения, для будущей записи на хранилище

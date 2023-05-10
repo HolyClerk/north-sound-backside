@@ -1,4 +1,4 @@
-﻿namespace NorthSound.Backend.Domain.Entities;
+﻿namespace NorthSound.Backend.Domain.SongEntities;
 
 public class SongFile
 {

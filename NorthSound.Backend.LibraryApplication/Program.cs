@@ -7,6 +7,7 @@ using NorthSound.Backend.Services.Abstractions;
 using NorthSound.Backend.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using Microsoft.AspNetCore.Authentication.OAuth;
 
 void ConnectDatabase(WebApplicationBuilder builder)
 {
@@ -20,39 +21,29 @@ void ConnectDatabase(WebApplicationBuilder builder)
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services
-    .AddAuthentication("OAuth")
-    .AddJwtBearer("OAuth", config =>
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        var tokenGen = new JwtTokenGenerator(builder.Configuration);
-        var key = tokenGen.GetSymmetricSecurityKey();
-
-        config.Events = new JwtBearerEvents
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            OnMessageReceived = context =>
-            {
-                if (context.Request.Query.ContainsKey("t"))
-                    context.Token = context.Request.Query["t"];
-
-                return Task.CompletedTask;
-            }
-        };
-
-        config.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateAudience = false,
+            ValidateIssuerSigningKey = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuer = true,
             ValidIssuer = JwtTokenGenerator.Issuer,
             ValidAudience = JwtTokenGenerator.Audience,
-            IssuerSigningKey = key,
+            IssuerSigningKey = new JwtTokenGenerator(builder.Configuration).GetSymmetricSecurityKey(),
         };
-    });
+    }
+);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 ConnectDatabase(builder);
-\
+
 builder.Services
     .AddTransient<IStorageGenerator, StorageGenerator>()        // Класс, необходимый для создания путей
     .AddTransient<ITokenHandler, JwtTokenGenerator>()           // Сервис работы с JWT токенами

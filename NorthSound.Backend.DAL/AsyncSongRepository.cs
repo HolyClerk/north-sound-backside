@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NorthSound.Backend.DAL.Abstractions;
-using NorthSound.Backend.Domain.Entities;
+using NorthSound.Backend.Domain.SongEntities;
 
 namespace NorthSound.Backend.DAL;
 
@@ -13,25 +13,25 @@ public class AsyncSongRepository : IAsyncSongRepository
         _songContext = songContext;
     }
 
-    public IEnumerable<Song> GetSongs()
+    public IEnumerable<SongDTO> GetSongs()
     {
         return _songContext.Songs;
     }
 
-    public async Task CreateAsync(Song entity)
+    public async Task CreateAsync(SongDTO entity)
     {
         await _songContext.AddAsync(entity);
     }
 
-    public async Task<Song?> GetSongAsync(int id)
+    public async Task<SongDTO?> GetSongAsync(int id)
     {
         return
             await _songContext.Songs.FindAsync(id);
     }
 
-    public async Task UpdateAsync(Song entity)
+    public async Task UpdateAsync(SongDTO entity)
     {
-        Song? current = await _songContext.Songs.FindAsync(entity.Id);
+        SongDTO? current = await _songContext.Songs.FindAsync(entity.Id);
 
         if (current is not null)
             _songContext.Entry(entity).State = EntityState.Modified;
@@ -39,9 +39,9 @@ public class AsyncSongRepository : IAsyncSongRepository
 
     public async Task DeleteAsync(int id)
     {
-        Song? entity = await _songContext.Songs.FindAsync(id);
+        SongDTO? entity = await _songContext.Songs.FindAsync(id);
 
-        if (entity is Song currentEntity)
+        if (entity is SongDTO currentEntity)
             _songContext.Songs.Remove(currentEntity);
     }
 

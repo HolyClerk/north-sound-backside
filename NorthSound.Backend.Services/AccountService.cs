@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NorthSound.Backend.DAL;
 using NorthSound.Backend.DAL.Abstractions;
-using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
+using NorthSound.Backend.Domain.Entities;
 
 namespace NorthSound.Backend.Services;
 
@@ -43,7 +43,7 @@ public class AccountService : IAccountService
     {
         var entity = await _context.Users.FirstOrDefaultAsync(x => x.Name == request.Username);
 
-        if ((entity is not User user) || (!user.Password.Equals(request.Password)))
+        if ((entity is not UserDTO user) || (!user.Password.Equals(request.Password)))
             return GenericResponse<AuthenticateResponse>.Failed("Такого пользователя не существует");
 
         var token = _tokenHandler.GenerateToken(user);
@@ -51,7 +51,7 @@ public class AccountService : IAccountService
         return GenericResponse<AuthenticateResponse>.Success(new AuthenticateResponse(user, token));
     }
 
-    private async Task CreateUserAsync(User newUser)
+    private async Task CreateUserAsync(UserDTO newUser)
     {
         await _context.Users.AddAsync(newUser);
         await _context.SaveChangesAsync();

@@ -1,8 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using NorthSound.Backend.Domain.Entities;
 
-namespace NorthSound.Backend.Domain.Entities;
+namespace NorthSound.Backend.Domain.SongEntities;
 
-public class Song
+[Table(name: "Songs")]
+public class SongDTO
 {
     [Key] 
     public int Id { get; set; } = default;
@@ -18,5 +21,5 @@ public class Song
     [Required]
     public Uri Path { get; set; } = default!;
 
-    public User? Owner { get; set; }
+    public UserDTO? Owner { get; set; }
 }

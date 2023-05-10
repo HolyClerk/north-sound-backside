@@ -1,4 +1,4 @@
-﻿using NorthSound.Backend.Domain.Entities;
+﻿using NorthSound.Backend.Domain.SongEntities;
 using NorthSound.Backend.Domain.Responses;
 
 namespace NorthSound.Backend.Services.Abstractions;
@@ -42,13 +42,13 @@ public interface ILibraryService
 
     /// <summary>
     /// На основе передаваемого параметра <see cref="Stream"/> создается физический файл в хранилище, а его расположение записывается в модель 
-    /// <see cref="Song"/> для размещения сущности в базе данных.
+    /// <see cref="SongDTO"/> для размещения сущности в базе данных.
     /// </summary>
     /// <returns><see cref="GenericResponse{SongFile}"/></returns>
-    Task<GenericResponse<SongModel>> CreateSongAsync(Song entity, Stream stream, IStorageGenerator storage);
+    Task<GenericResponse<SongModel>> CreateSongAsync(SongDTO entity, Stream stream, IStorageGenerator storage);
 
     /// <summary>
-    /// Асинхронное удаление записи <see cref="Song"/> из базы данных на основе параметра id.
+    /// Асинхронное удаление записи <see cref="SongDTO"/> из базы данных на основе параметра id.
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
