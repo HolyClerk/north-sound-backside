@@ -3,6 +3,7 @@ using NorthSound.Backend.Domain.SongEntities;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.LibraryApplication.ViewModels;
 using NorthSound.Backend.Services.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NorthSound.Backend.LibraryApplication.Controllers;
 
@@ -17,16 +18,14 @@ public class LibraryController : ControllerBase
         _library = libraryService;
     }
 
-    // GET: api/library/
-    [HttpGet]
-    public IEnumerable<SongModel> Get()
+    [HttpGet("library")]
+    public IEnumerable<SongModel> GetAllSongs()
     {
         return _library.GetSongs();
     }
 
-    // GET: api/library/5
-    [HttpGet("{id}")]
-    public async Task<ActionResult> Get(int id)
+    [HttpGet("library/{id}")]
+    public async Task<ActionResult> GetSongById(int id)
     {
         var response = await _library.GetSongFileAsync(id);
         
@@ -39,9 +38,9 @@ public class LibraryController : ControllerBase
             response.Data.Name);
     }
 
-    // POST: api/library/
-    [HttpPost]
-    public async Task<ActionResult> Post(
+    [HttpPost("library")]
+    [Authorize]
+    public async Task<ActionResult> PostSong(
         [FromForm] SongViewModel viewModel, 
         [FromServices] IStorageGenerator storage)
     {
@@ -59,9 +58,8 @@ public class LibraryController : ControllerBase
         return Ok(response.Data);
     }
 
-    // DELETE: api/library/5
     [HttpDelete]
-    public async Task<ActionResult> Delete(int id)
+    public async Task<ActionResult> DeleteById(int id)
     {
         var isDeleted = await _library.TryDeleteAsync(id);
 
