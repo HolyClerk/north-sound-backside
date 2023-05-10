@@ -15,7 +15,7 @@ public class StreamController : ControllerBase
         _library = library;
     }
 
-    // GET: api/library/5
+    // GET: api/stream/5
     [HttpGet("{id}")]
     public async Task<ActionResult<FileStream>> Get(int id)
     {
