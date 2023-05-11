@@ -45,7 +45,7 @@ namespace NorthSound.Backend.DAL.Migrations
 
                     b.HasIndex("SecondUserId");
 
-                    b.ToTable("Dialogues");
+                    b.ToTable("Dialogues", (string)null);
                 });
 
             modelBuilder.Entity("NorthSound.Backend.Domain.Entities.MessageDTO", b =>
@@ -80,7 +80,7 @@ namespace NorthSound.Backend.DAL.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("NorthSound.Backend.Domain.Entities.UserDTO", b =>
@@ -110,7 +110,7 @@ namespace NorthSound.Backend.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("NorthSound.Backend.Domain.SongEntities.SongDTO", b =>
@@ -142,7 +142,7 @@ namespace NorthSound.Backend.DAL.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Songs");
+                    b.ToTable("Songs", (string)null);
                 });
 
             modelBuilder.Entity("NorthSound.Backend.Domain.Entities.DialogueDTO", b =>

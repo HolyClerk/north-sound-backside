@@ -11,15 +11,18 @@ namespace NorthSound.Backend.LibraryApplication.Hubs;
 [Authorize]
 public class ChatHub : Hub
 {
+    private readonly IDialogueService _dialogueService;
     private readonly IConnectionManager _connectionManager;
     private readonly IAccountService _accountService;
 
     public ChatHub(
         IAccountService accountService,
-        IConnectionManager chatService)
+        IConnectionManager chatService,
+        IDialogueService dialogueService)
     {
         _connectionManager = chatService;
         _accountService = accountService;
+        _dialogueService = dialogueService;
     }
 
     public override async Task OnConnectedAsync()
