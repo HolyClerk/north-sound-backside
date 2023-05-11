@@ -2,6 +2,7 @@
 using NorthSound.Backend.Domain.POCO.Chat;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace NorthSound.Backend.Services;
@@ -22,14 +23,30 @@ public class DialogueService : IDialogueService
         _context = context;
     }
 
-    public GenericResponse<Message> PrepareMessageForSending(MessageViewModel model)
+    public GenericResponse<Message> PrepareMessageForSending(MessageViewModel model, string senderConnectionId)
     {
-        throw new NotImplementedException();
+        ChatUser? receiver = _connectionManager.GetChatUserByUsername(model.ReceiverUsername);
+        ChatUser? sender = _connectionManager.GetChatUserByConnectionId(senderConnectionId);
+
+        if (receiver is null || sender is null)
+            return Failed<Message>("Пользователь не найден");
+
+        var message = new Message
+        {
+            Receiver = receiver,
+            Sender = sender,
+            MessageData = model.Message,
+        };
+
+        // TODO: Создать диалог, если такового нет
+        // TODO: Создать сообщение и привязать к диалогу
+
+        return Success(message);
     }
 
     public async Task<GenericResponse<ChatUser>> AddChatUser(ClaimsPrincipal userClaims, string connectionId)
     {
-        var usernameClaim = userClaims.Claims.FirstOrDefault(x => x.Type == "sub");
+        var usernameClaim = userClaims.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub);
         var existingUser = await _accountService.GetUserByNameAsync(usernameClaim!.Value);
 
         if (existingUser is null)
@@ -53,11 +70,4 @@ public class DialogueService : IDialogueService
 
     private static GenericResponse<T> Failed<T>(string details) 
         => GenericResponse<T>.Failed(details);
-}
-
-public interface IDialogueService
-{
-/*    GenericResponse<Message> PrepareMessageForSending(MessageViewModel model);
-    GenericResponse<ChatUser> AddChatUser(ClaimsPrincipal userClaims);
-    void RemoveChatUser(ClaimsPrincipal userClaims);*/
 }

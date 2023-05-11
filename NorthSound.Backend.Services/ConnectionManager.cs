@@ -53,9 +53,4 @@ public class ConnectionManager : IConnectionManager
 
     public ChatUser? GetChatUserByConnectionId(string username)
         => _users.FirstOrDefault(x => x.CurrentUser.Name == username);
-
-    public GenericResponse<Message> GenerateMessageResponse(MessageViewModel message)
-    {
-        
-    }
 }
