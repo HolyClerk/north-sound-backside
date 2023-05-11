@@ -13,4 +13,6 @@ public class DialogueDTO
     [Required] public UserDTO SecondUser { get; set; } = default!;
 
     [Required] public DateTime CreatedAt { get; set; } = default!;
+
+    public List<MessageDTO> Messages { get; set; } = new();
 }
