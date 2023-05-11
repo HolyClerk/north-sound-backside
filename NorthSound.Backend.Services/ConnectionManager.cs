@@ -1,5 +1,6 @@
 ﻿using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.POCO.Chat;
+using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
@@ -14,10 +15,10 @@ public class ConnectionManager : IConnectionManager
         _users = new();
     }
 
-    public bool AddUser(UserDTO user, string connectionId)
+    public ChatUser? AddUser(UserDTO user, string connectionId)
     {
         if (IsChatUserConnected(user))
-            return false;
+            return null;
 
         var chatUser = new ChatUser
         {
@@ -30,7 +31,7 @@ public class ConnectionManager : IConnectionManager
         };
 
         _users.Add(chatUser);
-        return true;
+        return chatUser;
     }
 
     public bool RemoveUser(string connectionId)
@@ -52,4 +53,9 @@ public class ConnectionManager : IConnectionManager
 
     public ChatUser? GetChatUserByConnectionId(string username)
         => _users.FirstOrDefault(x => x.CurrentUser.Name == username);
+
+    public GenericResponse<Message> GenerateMessageResponse(MessageViewModel message)
+    {
+        
+    }
 }
