@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="POCO\Register\" />
+    <Compile Remove="POCO\Register\**" />
+    <EmbeddedResource Remove="POCO\Register\**" />
+    <None Remove="POCO\Register\**" />
   </ItemGroup>
 
 </Project>
