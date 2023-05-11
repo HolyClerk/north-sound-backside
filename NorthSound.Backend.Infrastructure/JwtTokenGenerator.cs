@@ -13,7 +13,7 @@ public class JwtTokenGenerator : ITokenHandler
 {
     private readonly IConfiguration _configuration;
 
-    public const int TokenLifetime = 60; // 1 час
+    public const int TokenLifetime = 60; 
 
     public const string Issuer = "https://localhost:7125";
     public const string Audience = "https://localhost:7125";
@@ -42,7 +42,7 @@ public class JwtTokenGenerator : ITokenHandler
             audience:           Audience, 
             claims:             claims,
             notBefore:          DateTime.Now,
-            expires:            DateTime.Now.AddSeconds(60),
+            expires:            DateTime.Now.AddMinutes(TokenLifetime),
             signingCredentials: credentials
         );
 

@@ -6,8 +6,7 @@ using NorthSound.Backend.Services;
 using NorthSound.Backend.Services.Abstractions;
 using NorthSound.Backend.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Swashbuckle.AspNetCore.SwaggerUI;
-using Microsoft.AspNetCore.Authentication.OAuth;
+using NorthSound.Backend.LibraryApplication.Hubs;
 
 void ConnectDatabase(WebApplicationBuilder builder)
 {
@@ -21,6 +20,7 @@ void ConnectDatabase(WebApplicationBuilder builder)
 
 var builder = WebApplication.CreateBuilder(args);
 
+// JWT
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -38,18 +38,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     }
 );
 
+builder.Services.AddSignalR();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 ConnectDatabase(builder);
 
+// SERVICES
 builder.Services
     .AddTransient<IStorageGenerator, StorageGenerator>()        // Класс, необходимый для создания путей
     .AddTransient<ITokenHandler, JwtTokenGenerator>()           // Сервис работы с JWT токенами
     .AddScoped<IAsyncSongRepository, AsyncSongRepository>()     // Репозиторий музыки
     .AddScoped<ILibraryService, LibraryService>()               // Сервис, работающий с репо музыки
-    .AddScoped<IAccountService, AccountService>();              // Сервис, работающий с авторизацией пользователей
+    .AddScoped<IAccountService, AccountService>()               // Сервис, работающий с авторизацией пользователей
+    .AddSingleton<IConnectionManager, ConnectionManager>();
 
 var app = builder.Build();
 
@@ -66,5 +69,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/chat");
 
 app.Run();
