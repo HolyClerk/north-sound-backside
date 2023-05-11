@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.POCO.Chat;
-using NorthSound.Backend.Services;
 using NorthSound.Backend.Services.Abstractions;
 using System.IdentityModel.Tokens.Jwt;
 
