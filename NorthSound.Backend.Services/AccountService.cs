@@ -5,6 +5,7 @@ using NorthSound.Backend.DAL.Abstractions;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
 using NorthSound.Backend.Domain.Entities;
+using NorthSound.Backend.Domain.POCO.Auth;
 
 namespace NorthSound.Backend.Services;
 
@@ -23,7 +24,7 @@ public class AccountService : IAccountService
 
     public async Task<GenericResponse<AuthenticateResponse>> RegisterAsync(RegisterRequest request)
     {
-        var findedUser = await _context.Users.FirstOrDefaultAsync(x => x.Name == request.Username);
+        var findedUser = await GetUserByNameAsync(request.Username);
 
         if (findedUser is not null)
             return GenericResponse<AuthenticateResponse>.Failed("Такой пользователь уже существует");
@@ -41,7 +42,7 @@ public class AccountService : IAccountService
 
     public async Task<GenericResponse<AuthenticateResponse>> LoginAsync(AuthenticateRequest request)
     {
-        var entity = await _context.Users.FirstOrDefaultAsync(x => x.Name == request.Username);
+        var entity = await GetUserByNameAsync(request.Username);
 
         if ((entity is not UserDTO user) || (!user.Password.Equals(request.Password)))
             return GenericResponse<AuthenticateResponse>.Failed("Такого пользователя не существует");
@@ -50,9 +51,13 @@ public class AccountService : IAccountService
 
         return GenericResponse<AuthenticateResponse>.Success(new AuthenticateResponse(user, token));
     }
+    
+    public async Task<UserDTO?> GetUserByNameAsync(string username)
+        => await _context.Users.FirstOrDefaultAsync(user => user.Name == username);
 
     private async Task CreateUserAsync(UserDTO newUser)
     {
+        newUser.CreatedAt = DateTime.UtcNow;
         await _context.Users.AddAsync(newUser);
         await _context.SaveChangesAsync();
     }
