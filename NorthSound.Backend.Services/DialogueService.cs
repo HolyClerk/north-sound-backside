@@ -25,30 +25,19 @@ public class DialogueService : IDialogueService
         _context = context;
     }
 
-    public async Task<GenericResponse<Message>> PrepareMessageForSendingAsync(MessageViewModel model, string senderConnectionId)
+    public async Task<MessageResponse> PrepareMessageForSendingAsync(MessageRequest request)
     {
-        ChatUser? receiver = _connectionManager.GetChatUserByUsername(model.ReceiverUsername);
-        ChatUser? sender = _connectionManager.GetChatUserByConnectionId(senderConnectionId);
+        var createdMessage = await CreateMessageInDatabaseAsync(request);
 
-        if (receiver is null || sender is null)
-            return Failed<Message>("Пользователь не найден");
+        if (createdMessage is null)
+            return MessageResponse.Failed("Не удалось создать сообщение в базе данных");
 
-        var message = new Message
-        {
-            Receiver = receiver,
-            Sender = sender,
-            MessageData = model.Message,
-        };
-
-        var dialogueDTO = await GetDialogueBetweenAsync(sender.CurrentUser, receiver.CurrentUser);
-        await AddMessageAsync(message, dialogueDTO);
-
-        return Success(message);
+        return CreateMessageResponse(createdMessage);
     }
 
     public async Task<GenericResponse<ChatUser>> AddChatUserAsync(ClaimsPrincipal userClaims, string connectionId)
     {
-        var usernameClaim = userClaims.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub);
+        var usernameClaim = userClaims.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Name);
         var existingUser = await _accountService.GetUserByNameAsync(usernameClaim!.Value);
 
         if (existingUser is null)
@@ -67,9 +56,39 @@ public class DialogueService : IDialogueService
         _connectionManager.RemoveUser(connectionId);
     }
 
-    private async Task<DialogueDTO> GetDialogueBetweenAsync(UserDTO firstUser, UserDTO secondUser)
+    private async Task<Message?> CreateMessageInDatabaseAsync(MessageRequest request)
     {
-        DialogueDTO? existingDialogue = await _context.Dialogues.FirstOrDefaultAsync(dialogue
+        UserDTO? sender = _connectionManager.GetChatUserByConnectionId(request.SenderConnectionId)?.CurrentUser;
+        UserDTO? receiver = await _accountService.GetUserByNameAsync(request.ReceiverUsername);
+
+        // Если получать/отправлять некому
+        if (sender is null || receiver is null)
+            return null;
+
+        var message = new Message(receiver, sender, request.Message);
+        var dialogueDTO = await AddDialogueBetweenAsync(sender, receiver);
+        await AddMessageAsync(message, dialogueDTO);
+        await _context.SaveChangesAsync();
+
+        return message;
+    }
+
+    private MessageResponse CreateMessageResponse(Message message)
+    {
+        var senderChatUser = _connectionManager.GetChatUserByUsername(message.Sender.Name);
+        var receiverChatUser = _connectionManager.GetChatUserByUsername(message.Receiver.Name);
+
+        if (receiverChatUser is null || senderChatUser is null)
+            return MessageResponse.Failed("Пользователь оффлайн");
+
+        return MessageResponse.Success(senderChatUser, receiverChatUser, message);
+    }
+
+    private async Task<DialogueDTO> AddDialogueBetweenAsync(UserDTO firstUser, UserDTO secondUser)
+    {
+        DialogueDTO? existingDialogue = await _context.Dialogues
+            .AsNoTracking()
+            .FirstOrDefaultAsync(dialogue
                 => (dialogue.FirstUser.Id == firstUser.Id   && dialogue.SecondUser.Id == secondUser.Id)
                 || (dialogue.FirstUser.Id == secondUser.Id  && dialogue.SecondUser.Id == firstUser.Id));
 
@@ -78,23 +97,24 @@ public class DialogueService : IDialogueService
 
         var newDialogue = new DialogueDTO
         {
-            FirstUser = firstUser,
-            SecondUser = secondUser,
+            FirstUserId = firstUser.Id,
+            SecondUserId = secondUser.Id,
             CreatedAt = DateTime.UtcNow,
         };
 
-        var createdEntry = await _context.Dialogues.AddAsync(newDialogue);
-        return createdEntry.Entity;
+        await _context.Dialogues.AddAsync(newDialogue);
+        await _context.SaveChangesAsync();
+        return newDialogue;
     }
 
     private async Task AddMessageAsync(Message message, DialogueDTO dialogue)
     {
         var messageDTO = new MessageDTO
         {
-            Sender = message.Sender.CurrentUser,
-            Receiver = message.Receiver.CurrentUser,
-            Message = message.MessageData,
-            Dialogue = dialogue,
+            SenderId = message.Sender.Id,
+            ReceiverId = message.Receiver.Id,
+            Message = message.Value,
+            DialogueId = dialogue.Id,
             CreatedAt = DateTime.UtcNow,
         };
 
