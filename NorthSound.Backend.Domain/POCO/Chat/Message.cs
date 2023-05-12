@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NorthSound.Backend.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,17 @@ namespace NorthSound.Backend.Domain.POCO.Chat;
 
 public class Message
 {
-    public ChatUser Sender { get; set; }
-    public ChatUser Receiver { get; set; }
+    public Message() { }
 
-    public string MessageData { get; set; }
+    public Message(UserDTO sender, UserDTO receiver, string messageData)
+    {
+        Sender = sender;
+        Receiver = receiver;
+        Value = messageData;
+    }
+
+    public UserDTO Sender { get; set; }
+    public UserDTO Receiver { get; set; }
+
+    public string Value { get; set; }
 }

@@ -48,9 +48,9 @@ public class ConnectionManager : IConnectionManager
     public bool IsChatUserConnected(UserDTO user)
         => _users.Any(x => x.CurrentUser.Id == user.Id);
 
-    public ChatUser? GetChatUserByUsername(string connectionId)
-        => _users.FirstOrDefault(x => x.Connection.Id == connectionId);
-
-    public ChatUser? GetChatUserByConnectionId(string username)
+    public ChatUser? GetChatUserByUsername(string username)
         => _users.FirstOrDefault(x => x.CurrentUser.Name == username);
+
+    public ChatUser? GetChatUserByConnectionId(string connectionId)
+        => _users.FirstOrDefault(x => x.Connection.Id == connectionId);
 }
