@@ -1,4 +1,4 @@
-﻿namespace NorthSound.Backend.Services.Abstractions;
+﻿namespace NorthSound.Backend.Services.Other;
 
 public interface IStorageGenerator
 {

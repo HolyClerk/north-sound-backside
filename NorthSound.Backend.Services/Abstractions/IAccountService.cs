@@ -8,5 +8,5 @@ public interface IAccountService
 {
     Task<GenericResponse<AuthenticateResponse>> RegisterAsync(RegisterRequest request);
     Task<GenericResponse<AuthenticateResponse>> LoginAsync(AuthenticateRequest request);
-    Task<UserDTO?> GetUserByNameAsync(string username);
+    Task<User?> GetUserByNameAsync(string username);
 }

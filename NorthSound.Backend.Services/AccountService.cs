@@ -6,6 +6,7 @@ using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
 using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.POCO.Auth;
+using NorthSound.Backend.Services.Other;
 
 namespace NorthSound.Backend.Services;
 
@@ -44,7 +45,7 @@ public class AccountService : IAccountService
     {
         var entity = await GetUserByNameAsync(request.Username);
 
-        if ((entity is not UserDTO user) || (!user.Password.Equals(request.Password)))
+        if ((entity is not User user) || (!user.Password.Equals(request.Password)))
             return GenericResponse<AuthenticateResponse>.Failed("Такого пользователя не существует");
 
         var token = _tokenHandler.GenerateToken(user);
@@ -52,10 +53,10 @@ public class AccountService : IAccountService
         return GenericResponse<AuthenticateResponse>.Success(new AuthenticateResponse(user, token));
     }
     
-    public async Task<UserDTO?> GetUserByNameAsync(string username)
+    public async Task<User?> GetUserByNameAsync(string username)
         => await _context.Users.FirstOrDefaultAsync(user => user.Name == username);
 
-    private async Task CreateUserAsync(UserDTO newUser)
+    private async Task CreateUserAsync(User newUser)
     {
         newUser.CreatedAt = DateTime.UtcNow;
         await _context.Users.AddAsync(newUser);

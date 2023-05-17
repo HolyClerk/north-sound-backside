@@ -6,12 +6,12 @@ public class ChatUser
 {
     public ChatUser() { }
 
-    public ChatUser(UserDTO user)
+    public ChatUser(User user)
     {
         CurrentUser = user;
     }
 
-    public UserDTO CurrentUser { get; set; } = default!;
+    public User CurrentUser { get; set; } = default!;
     
     public ChatConnection Connection { get; set; } = default!;
 }

@@ -2,6 +2,8 @@
 using NorthSound.Backend.Domain.SongEntities;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
+using NorthSound.Backend.Domain.Entities;
+using NorthSound.Backend.Services.Other;
 
 namespace NorthSound.Backend.Services;
 
@@ -20,48 +22,48 @@ public class LibraryService : ILibraryService
         _repository = repository;
     }
 
-    public IEnumerable<SongModel> GetSongs() 
+    public IEnumerable<SongDTO> GetSongs() 
     {
         var songs = _repository.GetSongs();
-        var songModels = new List<SongModel>();
+        var songModels = new List<SongDTO>();
 
         foreach (var song in songs)
         {
-            songModels.Add(new SongModel(song));
+            songModels.Add(new SongDTO(song));
         }
 
         return songModels;
     }
 
-    public async Task<GenericResponse<SongModel>> GetSongAsync(int id)
+    public async Task<GenericResponse<SongDTO>> GetSongAsync(int id)
     {
         var entity = await _repository.GetSongAsync(id);
 
         if (entity is null)
-            return GenericResponse<SongModel>.Failed("Не найдено", ResponseStatus.NotFound);
+            return GenericResponse<SongDTO>.Failed("Не найдено", ResponseStatus.NotFound);
 
-        return GenericResponse<SongModel>.Success(new SongModel(entity)); 
+        return GenericResponse<SongDTO>.Success(new SongDTO(entity)); 
     }
 
-    public async Task<GenericResponse<SongFile>> GetSongFileAsync(int id)
+    public async Task<GenericResponse<SongFileDTO>> GetSongFileAsync(int id)
     {
         var entity = await _repository.GetSongAsync(id);
 
         if (entity is null)
-            return GenericResponse<SongFile>.Failed("Не найдено", ResponseStatus.NotFound);
+            return GenericResponse<SongFileDTO>.Failed("Не найдено", ResponseStatus.NotFound);
 
-        var data = new SongFile()
+        var data = new SongFileDTO()
         {
             Name = $"{entity.Author} - {entity.Name}",
             FileStream = new FileStream(entity.Path.AbsolutePath, FileMode.Open),
             ContentType = ILibraryService.AudioContentType,
         };
 
-        return GenericResponse<SongFile>.Success(data);
+        return GenericResponse<SongFileDTO>.Success(data);
     }
 
-    public async Task<GenericResponse<SongModel>> CreateSongAsync(
-        SongDTO entity, 
+    public async Task<GenericResponse<SongDTO>> CreateSongAsync(
+        Song entity, 
         Stream stream, 
         IStorageGenerator storage)
     {
@@ -77,17 +79,17 @@ public class LibraryService : ILibraryService
             await _repository.SaveAsync();
             await copyTask;
 
-            return GenericResponse<SongModel>.Success(new SongModel(entity));
+            return GenericResponse<SongDTO>.Success(new SongDTO(entity));
         }
         catch (Exception)
         {
-            return GenericResponse<SongModel>.Failed("Неизвестная ошибка");
+            return GenericResponse<SongDTO>.Failed("Неизвестная ошибка");
         }
     }
 
     public async Task<bool> TryDeleteAsync(int id)
     {
-        SongDTO? entity = await _repository.GetSongAsync(id);
+        Song? entity = await _repository.GetSongAsync(id);
 
         if (entity is null)
             return false;

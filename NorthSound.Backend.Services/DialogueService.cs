@@ -56,16 +56,16 @@ public class DialogueService : IDialogueService
         _connectionManager.RemoveUser(connectionId);
     }
 
-    private async Task<Message?> CreateMessageInDatabaseAsync(MessageRequest request)
+    private async Task<MessageDTO?> CreateMessageInDatabaseAsync(MessageRequest request)
     {
-        UserDTO? sender = _connectionManager.GetChatUserByConnectionId(request.SenderConnectionId)?.CurrentUser;
-        UserDTO? receiver = await _accountService.GetUserByNameAsync(request.ReceiverUsername);
+        User? sender = _connectionManager.GetChatUserByConnectionId(request.SenderConnectionId)?.CurrentUser;
+        User? receiver = await _accountService.GetUserByNameAsync(request.ReceiverUsername);
 
         // Если получать/отправлять некому
         if (sender is null || receiver is null)
             return null;
 
-        var message = new Message(receiver, sender, request.Message);
+        var message = new MessageDTO(receiver, sender, request.Message);
         var dialogueDTO = await AddDialogueBetweenAsync(sender, receiver);
         await AddMessageAsync(message, dialogueDTO);
         await _context.SaveChangesAsync();
@@ -73,7 +73,7 @@ public class DialogueService : IDialogueService
         return message;
     }
 
-    private MessageResponse CreateMessageResponse(Message message)
+    private MessageResponse CreateMessageResponse(MessageDTO message)
     {
         var senderChatUser = _connectionManager.GetChatUserByUsername(message.Sender.Name);
         var receiverChatUser = _connectionManager.GetChatUserByUsername(message.Receiver.Name);
@@ -84,9 +84,9 @@ public class DialogueService : IDialogueService
         return MessageResponse.Success(senderChatUser, receiverChatUser, message);
     }
 
-    private async Task<DialogueDTO> AddDialogueBetweenAsync(UserDTO firstUser, UserDTO secondUser)
+    private async Task<Dialogue> AddDialogueBetweenAsync(User firstUser, User secondUser)
     {
-        DialogueDTO? existingDialogue = await _context.Dialogues
+        Dialogue? existingDialogue = await _context.Dialogues
             .AsNoTracking()
             .FirstOrDefaultAsync(dialogue
                 => (dialogue.FirstUser.Id == firstUser.Id   && dialogue.SecondUser.Id == secondUser.Id)
@@ -95,7 +95,7 @@ public class DialogueService : IDialogueService
         if (existingDialogue is not null)
             return existingDialogue;
 
-        var newDialogue = new DialogueDTO
+        var newDialogue = new Dialogue
         {
             FirstUserId = firstUser.Id,
             SecondUserId = secondUser.Id,
@@ -107,13 +107,13 @@ public class DialogueService : IDialogueService
         return newDialogue;
     }
 
-    private async Task AddMessageAsync(Message message, DialogueDTO dialogue)
+    private async Task AddMessageAsync(MessageDTO message, Dialogue dialogue)
     {
-        var messageDTO = new MessageDTO
+        var messageDTO = new Message
         {
             SenderId = message.Sender.Id,
             ReceiverId = message.Receiver.Id,
-            Message = message.Value,
+            Text = message.Value,
             DialogueId = dialogue.Id,
             CreatedAt = DateTime.UtcNow,
         };
