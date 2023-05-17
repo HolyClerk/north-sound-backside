@@ -1,9 +1,10 @@
-﻿using NorthSound.Backend.DAL.Abstractions;
-using NorthSound.Backend.Domain.SongEntities;
+﻿using NorthSound.Backend.Domain.SongEntities;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
 using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Services.Other;
+using NorthSound.Backend.DAL;
+using Microsoft.EntityFrameworkCore;
 
 namespace NorthSound.Backend.Services;
 
@@ -15,16 +16,16 @@ namespace NorthSound.Backend.Services;
 /// </summary>
 public class LibraryService : ILibraryService
 {
-    private readonly IAsyncSongRepository _repository;
+    private readonly ApplicationContext _context;
 
-    public LibraryService(IAsyncSongRepository repository)
+    public LibraryService(ApplicationContext context)
     {
-        _repository = repository;
+        _context = context;
     }
 
     public IEnumerable<SongDTO> GetSongs() 
     {
-        var songs = _repository.GetSongs();
+        var songs = _context.Songs;
         var songModels = new List<SongDTO>();
 
         foreach (var song in songs)
@@ -37,7 +38,7 @@ public class LibraryService : ILibraryService
 
     public async Task<GenericResponse<SongDTO>> GetSongAsync(int id)
     {
-        var entity = await _repository.GetSongAsync(id);
+        var entity = await _context.Songs.FirstOrDefaultAsync(x => x.Id == id);
 
         if (entity is null)
             return GenericResponse<SongDTO>.Failed("Не найдено", ResponseStatus.NotFound);
@@ -47,7 +48,7 @@ public class LibraryService : ILibraryService
 
     public async Task<GenericResponse<SongFileDTO>> GetSongFileAsync(int id)
     {
-        var entity = await _repository.GetSongAsync(id);
+        var entity = await _context.Songs.FirstOrDefaultAsync(x => x.Id == id);
 
         if (entity is null)
             return GenericResponse<SongFileDTO>.Failed("Не найдено", ResponseStatus.NotFound);
@@ -75,8 +76,8 @@ public class LibraryService : ILibraryService
 
         try
         {
-            await _repository.CreateAsync(entity);
-            await _repository.SaveAsync();
+            await _context.Songs.AddAsync(entity);
+            await _context.SaveChangesAsync();
             await copyTask;
 
             return GenericResponse<SongDTO>.Success(new SongDTO(entity));
@@ -89,13 +90,13 @@ public class LibraryService : ILibraryService
 
     public async Task<bool> TryDeleteAsync(int id)
     {
-        Song? entity = await _repository.GetSongAsync(id);
+        Song? entity = await _context.Songs.FirstOrDefaultAsync(x => x.Id == id);
 
         if (entity is null)
             return false;
 
-        await _repository.DeleteAsync(id);
-        await _repository.SaveAsync();
+        _context.Songs.Remove(entity);
+        await _context.SaveChangesAsync();
         return true;
     }
 
