@@ -3,6 +3,7 @@ using NorthSound.Backend.Domain.SongEntities;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
 using NorthSound.Backend.Domain.Entities;
+using NorthSound.Backend.Services.Other;
 
 namespace NorthSound.Backend.Services;
 

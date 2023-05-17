@@ -5,6 +5,7 @@ using NorthSound.Backend.LibraryApplication.ViewModels;
 using NorthSound.Backend.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using NorthSound.Backend.Domain.Entities;
+using NorthSound.Backend.Services.Other;
 
 namespace NorthSound.Backend.LibraryApplication.Controllers;
 

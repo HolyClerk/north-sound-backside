@@ -113,7 +113,7 @@ public class DialogueService : IDialogueService
         {
             SenderId = message.Sender.Id,
             ReceiverId = message.Receiver.Id,
-            Value = message.Value,
+            Text = message.Value,
             DialogueId = dialogue.Id,
             CreatedAt = DateTime.UtcNow,
         };

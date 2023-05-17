@@ -14,7 +14,7 @@ public class Message
 
     [Required] public int ReceiverId { get; set; }
   
-    [Required] public string Value { get; set; } = default!;
+    [Required] public string Text { get; set; } = default!;
 
     [Required] public DateTime CreatedAt { get; set; } = default!;
 
