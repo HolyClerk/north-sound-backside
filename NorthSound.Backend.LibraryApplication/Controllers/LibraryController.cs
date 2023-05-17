@@ -18,13 +18,13 @@ public class LibraryController : ControllerBase
         _library = libraryService;
     }
 
-    [HttpGet("library")]
+    [HttpGet]
     public IEnumerable<SongModel> GetAllSongs()
     {
         return _library.GetSongs();
     }
 
-    [HttpGet("library/{id}")]
+    [HttpGet("{id}")]
     public async Task<ActionResult> GetSongById(int id)
     {
         var response = await _library.GetSongFileAsync(id);
@@ -38,8 +38,7 @@ public class LibraryController : ControllerBase
             response.Data.Name);
     }
 
-    [HttpPost("library")]
-    [Authorize]
+    [HttpPost]
     public async Task<ActionResult> PostSong(
         [FromForm] SongViewModel viewModel, 
         [FromServices] IStorageGenerator storage)

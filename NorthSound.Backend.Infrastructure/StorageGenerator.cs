@@ -11,6 +11,6 @@ public class StorageGenerator : IStorageGenerator
             .GetInt32(-2_147_483_640, 2_147_483_640)
             .ToString();
 
-        return @$"Z:\Storage\{generatedName}";
+        return @$"C:\Storage\{generatedName}";
     }
 }
