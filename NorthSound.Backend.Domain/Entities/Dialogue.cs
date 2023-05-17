@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace NorthSound.Backend.Domain.Entities;
 
 [Table(name: "Dialogues")]
-public class DialogueDTO
+public class Dialogue
 {
     [Key] public int Id { get; set; } = default!;
 
@@ -14,7 +14,7 @@ public class DialogueDTO
 
     [Required] public DateTime CreatedAt { get; set; } = default!;
 
-    public UserDTO FirstUser { get; set; } = default!;
-    public UserDTO SecondUser { get; set; } = default!;
-    public List<MessageDTO> Messages { get; set; } = new();
+    public User FirstUser { get; set; } = default!;
+    public User SecondUser { get; set; } = default!;
+    public List<Message> Messages { get; set; } = new();
 }

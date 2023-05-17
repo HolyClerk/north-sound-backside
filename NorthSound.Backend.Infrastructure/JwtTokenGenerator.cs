@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using NorthSound.Backend.Domain.Entities;
-using NorthSound.Backend.Services.Abstractions;
+using NorthSound.Backend.Services.Other;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -27,7 +27,7 @@ public class JwtTokenGenerator : ITokenHandler
     /// Генерирует и возвращает JWT-токен на основе модели пользователя
     /// </summary>
     /// <returns>JWT токен</returns>
-    public string GenerateToken(UserDTO user)
+    public string GenerateToken(User user)
     {
         var claims = new List<Claim>()
         {

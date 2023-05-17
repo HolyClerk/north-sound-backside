@@ -1,10 +1,10 @@
 ﻿namespace NorthSound.Backend.Domain.SongEntities;
 
-public class SongFile
+public class SongFileDTO
 {
-    public SongFile() { }
+    public SongFileDTO() { }
 
-    public SongFile(string name, FileStream fileStream, string contentType)
+    public SongFileDTO(string name, FileStream fileStream, string contentType)
     {
         Name = name;
         FileStream = fileStream;

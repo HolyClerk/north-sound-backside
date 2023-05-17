@@ -1,13 +1,13 @@
-﻿using NorthSound.Backend.Domain.SongEntities;
+﻿using NorthSound.Backend.Domain.Entities;
 
 namespace NorthSound.Backend.DAL.Abstractions;
 
 public interface IAsyncSongRepository : IDisposable
 {
-    IEnumerable<SongDTO> GetSongs();
-    Task<SongDTO?> GetSongAsync(int id);
-    Task CreateAsync(SongDTO entity);
-    Task UpdateAsync(SongDTO entity);
+    IEnumerable<Song> GetSongs();
+    Task<Song?> GetSongAsync(int id);
+    Task CreateAsync(Song entity);
+    Task UpdateAsync(Song entity);
     Task DeleteAsync(int id);
     Task SaveAsync();
 }

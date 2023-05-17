@@ -9,13 +9,13 @@ public class MessageResponse
 
     public ChatUser Receiver { get; set; }
 
-    public Message Message { get; set; }
+    public MessageDTO Message { get; set; }
 
     public string Details { get; set; }
 
     public ResponseStatus Status { get; set; }
 
-    public static MessageResponse Success(ChatUser sender, ChatUser receiver, Message message)
+    public static MessageResponse Success(ChatUser sender, ChatUser receiver, MessageDTO message)
     {
         return new MessageResponse
         {

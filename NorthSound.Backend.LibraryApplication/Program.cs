@@ -7,6 +7,7 @@ using NorthSound.Backend.Services.Abstractions;
 using NorthSound.Backend.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using NorthSound.Backend.LibraryApplication.Hubs;
+using NorthSound.Backend.Services.Other;
 
 void ConnectDatabase(WebApplicationBuilder builder)
 {

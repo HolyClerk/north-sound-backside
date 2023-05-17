@@ -15,7 +15,7 @@ public class ConnectionManager : IConnectionManager
         _users = new();
     }
 
-    public ChatUser? AddUser(UserDTO user, string connectionId)
+    public ChatUser? AddUser(User user, string connectionId)
     {
         if (IsChatUserConnected(user))
             return null;
@@ -45,7 +45,7 @@ public class ConnectionManager : IConnectionManager
         return true;
     }
 
-    public bool IsChatUserConnected(UserDTO user)
+    public bool IsChatUserConnected(User user)
         => _users.Any(x => x.CurrentUser.Id == user.Id);
 
     public ChatUser? GetChatUserByUsername(string username)

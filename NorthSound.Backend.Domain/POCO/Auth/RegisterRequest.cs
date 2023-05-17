@@ -14,9 +14,9 @@ public class RegisterRequest
 
     [Required] public string Password { get; set; }
 
-    public UserDTO MapToUser()
+    public User MapToUser()
     {
-        return new UserDTO()
+        return new User()
         {
             Name = Username,
             Email = Email,
