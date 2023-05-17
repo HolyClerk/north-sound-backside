@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using NorthSound.Backend.DAL.Abstractions;
 using NorthSound.Backend.DAL;
 using NorthSound.Backend.Services;
 using NorthSound.Backend.Services.Abstractions;
