@@ -49,7 +49,6 @@ ConnectDatabase(builder);
 builder.Services
     .AddTransient<IStorageGenerator, StorageGenerator>()        // Класс, необходимый для создания путей
     .AddTransient<ITokenHandler, JwtTokenGenerator>()           // Сервис работы с JWT токенами
-    .AddScoped<IAsyncSongRepository, AsyncSongRepository>()     // Репозиторий музыки
     .AddScoped<ILibraryService, LibraryService>()               // Сервис, работающий с репо музыки
     .AddScoped<IAccountService, AccountService>()               // Сервис, работающий с авторизацией пользователей
     .AddScoped<IDialogueService, DialogueService>()

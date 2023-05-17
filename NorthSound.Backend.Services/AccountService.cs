@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NorthSound.Backend.DAL;
-using NorthSound.Backend.DAL.Abstractions;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
 using NorthSound.Backend.Domain.Entities;
