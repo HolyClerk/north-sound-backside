@@ -5,6 +5,7 @@ using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Services.Other;
 using NorthSound.Backend.DAL;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace NorthSound.Backend.Services;
 
@@ -17,10 +18,14 @@ namespace NorthSound.Backend.Services;
 public class LibraryService : ILibraryService
 {
     private readonly ApplicationContext _context;
+    private readonly ILocator _locator;
 
-    public LibraryService(ApplicationContext context)
+    public LibraryService(
+        ApplicationContext context,
+        ILocator locator)
     {
         _context = context;
+        _locator = locator;
     }
 
     public IEnumerable<SongDTO> GetSongs() 
@@ -56,29 +61,24 @@ public class LibraryService : ILibraryService
         var data = new SongFileDTO()
         {
             Name = $"{entity.Author} - {entity.Name}",
-            FileStream = new FileStream(entity.Path.AbsolutePath, FileMode.Open),
+            FileStream = new FileStream(_locator.GetWorkPath() + entity.FileName, FileMode.Open),
             ContentType = ILibraryService.AudioContentType,
         };
 
         return GenericResponse<SongFileDTO>.Success(data);
     }
 
-    public async Task<GenericResponse<SongDTO>> CreateSongAsync(
-        Song entity, 
-        Stream stream, 
-        IStorageGenerator storage)
+    public async Task<GenericResponse<SongDTO>> CreateSongAsync(Song entity, Stream stream)
     {
-        // Случайный путь к файлу
-        var pathToFile = storage.GetNewGeneratedPath();
-        entity.Path = new Uri(pathToFile);
-        // Запускаем задачу на копирование файла (открытого потока) в хранилище
-        Task copyTask = CopyStreamToFileAsync(stream, pathToFile);  
+        var uri = _locator.GeneratePath();
+        entity.FileName = Path.GetFileName(uri.LocalPath);
+        Task locateTask = _locator.LocateAsync(stream, uri.AbsolutePath);  
 
         try
         {
             await _context.Songs.AddAsync(entity);
             await _context.SaveChangesAsync();
-            await copyTask;
+            await locateTask;
 
             return GenericResponse<SongDTO>.Success(new SongDTO(entity));
         }
@@ -98,14 +98,5 @@ public class LibraryService : ILibraryService
         _context.Songs.Remove(entity);
         await _context.SaveChangesAsync();
         return true;
-    }
-
-    private static async Task CopyStreamToFileAsync(Stream stream, string pathToCopy)
-    {
-        using (var fileStream = new FileStream(pathToCopy, FileMode.Create))
-        {
-            await stream.CopyToAsync(fileStream);
-            await stream.DisposeAsync();
-        }
     }
 }

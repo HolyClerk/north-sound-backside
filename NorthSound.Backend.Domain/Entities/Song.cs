@@ -18,7 +18,7 @@ public class Song
     public string Author { get; set; } = default!;
 
     [Required]
-    public Uri Path { get; set; } = default!;
+    public string FileName { get; set; } = default!;
 
     public User? Owner { get; set; }
 }

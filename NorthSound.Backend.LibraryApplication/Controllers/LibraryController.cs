@@ -42,8 +42,7 @@ public class LibraryController : ControllerBase
 
     [HttpPost]
     public async Task<ActionResult> PostSong(
-        [FromForm] SongViewModel viewModel, 
-        [FromServices] IStorageGenerator storage)
+        [FromForm] SongViewModel viewModel)
     {
         Song mappedEntity = viewModel.MapToSong();
 
@@ -51,7 +50,7 @@ public class LibraryController : ControllerBase
         // открывается поток для чтения, для будущей записи на хранилище
         // и в БД.
         Stream stream = viewModel.SongFile.OpenReadStream();
-        var response = await _library.CreateSongAsync(mappedEntity, stream, storage);
+        var response = await _library.CreateSongAsync(mappedEntity, stream);
 
         if (response.Status is not ResponseStatus.Success)
             return BadRequest(response);
