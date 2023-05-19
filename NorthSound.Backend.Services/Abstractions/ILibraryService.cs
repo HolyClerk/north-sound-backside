@@ -47,7 +47,7 @@ public interface ILibraryService
     /// <see cref="Song"/> для размещения сущности в базе данных.
     /// </summary>
     /// <returns><see cref="GenericResponse{SongFile}"/></returns>
-    Task<GenericResponse<SongDTO>> CreateSongAsync(Song entity, Stream stream, IStorageGenerator storage);
+    Task<GenericResponse<SongDTO>> CreateSongAsync(Song entity, Stream stream);
 
     /// <summary>
     /// Асинхронное удаление записи <see cref="Song"/> из базы данных на основе параметра id.
