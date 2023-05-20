@@ -11,28 +11,30 @@ namespace NorthSound.Backend.Services;
 
 public class DialogueService : IDialogueService
 {
-    private readonly IConnectionManager _connectionManager;
+    private readonly IChatSessions _sessions;
     private readonly IAccountService _accountService;
     private readonly ApplicationContext _context;
 
     public DialogueService(
-        IConnectionManager connectionManager,
         IAccountService accountService,
         ApplicationContext context)
     {
-        _connectionManager = connectionManager;
         _accountService = accountService;
         _context = context;
+
+        _sessions = new ChatSessionsHandler();
     }
 
-    public async Task<MessageResponse> PrepareMessageForSendingAsync(MessageRequest request)
+    public async Task<MessageResponse> PrepareMessageAsync(MessageRequest request)
     {
+        // Первоначально пробуется создать сообщение в базе данных,
+        // а уже после - проверка возможности отправки к конечному пользователю.
         var createdMessage = await CreateMessageInDatabaseAsync(request);
 
         if (createdMessage is null)
             return MessageResponse.Failed("Не удалось создать сообщение в базе данных");
 
-        return CreateMessageResponse(createdMessage);
+        return BuildMessageResponse(createdMessage);
     }
 
     public async Task<GenericResponse<ChatUser>> AddChatUserAsync(ClaimsPrincipal userClaims, string connectionId)
@@ -43,7 +45,7 @@ public class DialogueService : IDialogueService
         if (existingUser is null)
             return Failed<ChatUser>("Пользователь не найден!");
 
-        var addedChatUser = _connectionManager.AddUser(existingUser, connectionId);
+        var addedChatUser = _sessions.AddUser(existingUser, connectionId);
 
         if (addedChatUser is null)
             return Failed<ChatUser>("Пользователь уже существует!");
@@ -51,14 +53,12 @@ public class DialogueService : IDialogueService
         return Success(addedChatUser);
     }
 
-    public void RemoveChatUser(string connectionId)
-    {
-        _connectionManager.RemoveUser(connectionId);
-    }
-
+    public bool RemoveChatUser(string connectionId)
+        => _sessions.RemoveUser(connectionId);
+    
     private async Task<MessageDTO?> CreateMessageInDatabaseAsync(MessageRequest request)
     {
-        User? sender = _connectionManager.GetChatUserByConnectionId(request.SenderConnectionId)?.CurrentUser;
+        User? sender = _sessions.GetChatUserByConnectionId(request.SenderConnectionId)?.CurrentUser;
         User? receiver = await _accountService.GetUserByNameAsync(request.ReceiverUsername);
 
         // Если получать/отправлять некому
@@ -66,17 +66,19 @@ public class DialogueService : IDialogueService
             return null;
 
         var message = new MessageDTO(receiver, sender, request.Message);
-        var dialogueDTO = await AddDialogueBetweenAsync(sender, receiver);
-        await AddMessageAsync(message, dialogueDTO);
+        // Создается или получается существующий диалог между пользователями
+        var dialogue = await AddDialogueBetweenAsync(sender, receiver);
+        // Сообщение сохраняется в базу данных с данными о диалоге
+        await AddMessageAsync(message, dialogue);
         await _context.SaveChangesAsync();
 
         return message;
     }
 
-    private MessageResponse CreateMessageResponse(MessageDTO message)
+    private MessageResponse BuildMessageResponse(MessageDTO message)
     {
-        var senderChatUser = _connectionManager.GetChatUserByUsername(message.Sender.Name);
-        var receiverChatUser = _connectionManager.GetChatUserByUsername(message.Receiver.Name);
+        var senderChatUser = _sessions.GetChatUserByUsername(message.Sender.Name);
+        var receiverChatUser = _sessions.GetChatUserByUsername(message.Receiver.Name);
 
         if (receiverChatUser is null || senderChatUser is null)
             return MessageResponse.Failed("Пользователь оффлайн");
@@ -88,9 +90,9 @@ public class DialogueService : IDialogueService
     {
         Dialogue? existingDialogue = await _context.Dialogues
             .AsNoTracking()
-            .FirstOrDefaultAsync(dialogue
-                => (dialogue.FirstUser.Id == firstUser.Id   && dialogue.SecondUser.Id == secondUser.Id)
-                || (dialogue.FirstUser.Id == secondUser.Id  && dialogue.SecondUser.Id == firstUser.Id));
+            .FirstOrDefaultAsync(dialogue => 
+                (dialogue.FirstUser.Id == firstUser.Id   && dialogue.SecondUser.Id == secondUser.Id) || 
+                (dialogue.FirstUser.Id == secondUser.Id  && dialogue.SecondUser.Id == firstUser.Id));
 
         if (existingDialogue is not null)
             return existingDialogue;

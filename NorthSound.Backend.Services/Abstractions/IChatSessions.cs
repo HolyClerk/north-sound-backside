@@ -4,7 +4,7 @@ using NorthSound.Backend.Domain.Responses;
 
 namespace NorthSound.Backend.Services.Abstractions;
 
-public interface IConnectionManager
+public interface IChatSessions
 {
     public ChatUser? AddUser(User user, string connectionId);
     public bool RemoveUser(string connectionId);

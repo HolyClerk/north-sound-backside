@@ -55,7 +55,7 @@ public class ChatHub : Hub
         _logger.LogInformation("Попытка отправки сообщения: {} \n\tПолучатель: {}", viewModel.Message, viewModel.ReceiverUsername);
 
         var request = new MessageRequest(viewModel.ReceiverUsername, Context.ConnectionId, viewModel.Message);
-        var response = await _dialogueService.PrepareMessageForSendingAsync(request);
+        var response = await _dialogueService.PrepareMessageAsync(request);
 
         if (response.Status is not ResponseStatus.Success)
         {

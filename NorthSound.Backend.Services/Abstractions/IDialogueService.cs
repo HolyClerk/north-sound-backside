@@ -6,7 +6,7 @@ namespace NorthSound.Backend.Services.Abstractions;
 
 public interface IDialogueService
 {
-    Task<MessageResponse> PrepareMessageForSendingAsync(MessageRequest request);
+    Task<MessageResponse> PrepareMessageAsync(MessageRequest request);
     Task<GenericResponse<ChatUser>> AddChatUserAsync(ClaimsPrincipal userClaims, string connectionId);
-    void RemoveChatUser(string connectionId);
+    bool RemoveChatUser(string connectionId);
 }
