@@ -30,6 +30,8 @@ x64/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
+*docker-compose.yml*
+
 *_i.c
 *_p.c
 *.ilk
