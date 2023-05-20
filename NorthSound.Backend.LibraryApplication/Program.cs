@@ -47,7 +47,7 @@ ConnectDatabase(builder);
 
 // SERVICES
 builder.Services
-    .AddTransient<ILocator, Locator>()        // Класс, необходимый для создания путей
+    .AddTransient<ILocator, Locator>()                          // Класс, необходимый для создания путей
     .AddTransient<ITokenHandler, JwtTokenGenerator>()           // Сервис работы с JWT токенами
     .AddScoped<ILibraryService, LibraryService>()               // Сервис, работающий с репо музыки
     .AddScoped<IAccountService, AccountService>()               // Сервис, работающий с авторизацией пользователей
