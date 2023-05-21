@@ -61,9 +61,9 @@ public class ChatService : IChatService
         if (sender is null || receiver is null)
             return null;
 
-        var message = new MessageDTO(receiver, sender, request.Message);
+        var message = new MessageDTO(sender, receiver, request.Message);
 
-        dialogue = await _dialogueService.GetDialogueAsync(receiver, sender);
+        dialogue = await _dialogueService.GetDialogueAsync(sender, receiver);
         dialogue ??= await _dialogueService.AddDialogueAsync(sender, receiver);
 
         return await _dialogueService.AddMessageAsync(message, dialogue); 
