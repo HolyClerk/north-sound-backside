@@ -51,7 +51,9 @@ builder.Services
     .AddTransient<ITokenHandler, JwtTokenGenerator>()           // Сервис работы с JWT токенами
     .AddScoped<ILibraryService, LibraryService>()               // Сервис, работающий с репо музыки
     .AddScoped<IAccountService, AccountService>()               // Сервис, работающий с авторизацией пользователей
-    .AddScoped<IDialogueService, DialogueService>();
+    .AddScoped<IDialogueService, DialogueService>()
+    .AddScoped<IChatService, ChatService>()
+    .AddSingleton<IChatSessions, ChatSessionsHandler>();
 
 var app = builder.Build();
 

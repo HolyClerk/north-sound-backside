@@ -9,14 +9,14 @@ namespace NorthSound.Backend.LibraryApplication.Hubs;
 [Authorize]
 public class ChatHub : Hub
 {
-    private readonly IDialogueService _dialogueService;
+    private readonly IChatService _chatService;
     private readonly ILogger<ChatHub> _logger;
 
     public ChatHub(
-        IDialogueService dialogueService,
+        IChatService dialogueService,
         ILogger<ChatHub> logger)
     {
-        _dialogueService = dialogueService;
+        _chatService = dialogueService;
         _logger = logger;
     }
 
@@ -31,7 +31,7 @@ public class ChatHub : Hub
             return;
         }
 
-        var response = await _dialogueService.AddChatUserAsync(userClaims, connectionId);
+        var response = await _chatService.AddChatUserAsync(userClaims, connectionId);
 
         if (response.Status is not ResponseStatus.Success)
         {
@@ -45,7 +45,7 @@ public class ChatHub : Hub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        _dialogueService.RemoveChatUser(Context.ConnectionId);
+        _chatService.RemoveChatUser(Context.ConnectionId);
         _logger.LogInformation("Пользователь отключен {}", Context.ConnectionId);
         await base.OnDisconnectedAsync(exception);
     }
@@ -55,7 +55,7 @@ public class ChatHub : Hub
         _logger.LogInformation("Попытка отправки сообщения: {} \n\tПолучатель: {}", viewModel.Message, viewModel.ReceiverUsername);
 
         var request = new MessageRequest(viewModel.ReceiverUsername, Context.ConnectionId, viewModel.Message);
-        var response = await _dialogueService.PrepareMessageAsync(request);
+        var response = await _chatService.BuildMessageAsync(request);
 
         if (response.Status is not ResponseStatus.Success)
         {
