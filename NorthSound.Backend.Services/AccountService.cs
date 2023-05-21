@@ -1,25 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NorthSound.Backend.DAL;
 using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
 using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.POCO.Auth;
 using NorthSound.Backend.Services.Other;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace NorthSound.Backend.Services;
 
 public class AccountService : IAccountService
 {
+    private readonly IMemoryCache _memoryCache;
     private readonly ITokenHandler _tokenHandler;
     private readonly ApplicationContext _context;
 
     public AccountService(
-        ApplicationContext context, 
-        ITokenHandler tokenHandler)
+        ApplicationContext context,
+        ITokenHandler tokenHandler,
+        IMemoryCache memoryCache)
     {
         _context = context;
         _tokenHandler = tokenHandler;
+        _memoryCache = memoryCache;
     }
 
     public async Task<GenericResponse<AuthenticateResponse>> RegisterAsync(RegisterRequest request)
@@ -42,12 +45,16 @@ public class AccountService : IAccountService
 
     public async Task<GenericResponse<AuthenticateResponse>> LoginAsync(AuthenticateRequest request)
     {
-        var entity = await GetUserByNameAsync(request.Username);
+        _memoryCache.TryGetValue(request.Username, out User? user);
+        user ??= await GetUserByNameAsync(request.Username);
 
-        if ((entity is not User user) || (!user.Password.Equals(request.Password)))
+        if (user is null || !user.Password.Equals(request.Password))
             return GenericResponse<AuthenticateResponse>.Failed("Такого пользователя не существует");
 
+        var options = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60));
         var token = _tokenHandler.GenerateToken(user);
+
+        _memoryCache.Set(user.Name, user, options);
 
         return GenericResponse<AuthenticateResponse>.Success(new AuthenticateResponse(user, token));
     }
