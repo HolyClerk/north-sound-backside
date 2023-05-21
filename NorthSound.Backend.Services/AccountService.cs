@@ -45,17 +45,26 @@ public class AccountService : IAccountService
 
     public async Task<GenericResponse<AuthenticateResponse>> LoginAsync(AuthenticateRequest request)
     {
+        bool shouldCache = false;
+
         _memoryCache.TryGetValue(request.Username, out User? user);
-        user ??= await GetUserByNameAsync(request.Username);
+        
+        if (user is null)
+        {
+            shouldCache = true;
+            user = await GetUserByNameAsync(request.Username);
+        }
 
         if (user is null || !user.Password.Equals(request.Password))
             return GenericResponse<AuthenticateResponse>.Failed("Такого пользователя не существует");
 
-        var options = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60));
+        if (shouldCache)
+        {
+            var options = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60));
+            _memoryCache.Set(user.Name, user, options);
+        }
+
         var token = _tokenHandler.GenerateToken(user);
-
-        _memoryCache.Set(user.Name, user, options);
-
         return GenericResponse<AuthenticateResponse>.Success(new AuthenticateResponse(user, token));
     }
     
