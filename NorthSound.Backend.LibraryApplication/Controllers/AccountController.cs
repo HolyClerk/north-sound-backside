@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NorthSound.Backend.Domain.POCO.Auth;
 using NorthSound.Backend.Domain.Responses;
+using NorthSound.Backend.Domain.ViewModels;
 using NorthSound.Backend.Services.Abstractions;
 
 namespace NorthSound.Backend.LibraryApplication.Controllers;
@@ -19,11 +20,12 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult> Register([FromBody] RegisterRequest request)
+    public async Task<ActionResult> Register([FromBody] RegisterViewModel viewModel)
     {
         if (ModelState.IsValid is false)
             return BadRequest(ModelState);
 
+        var request = viewModel.MapToRequest();
         var response = await _accountService.RegisterAsync(request);
 
         if (response.Status is not ResponseStatus.Success)
@@ -33,11 +35,12 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult> Login([FromBody] AuthenticateRequest request)
+    public async Task<ActionResult> Login([FromBody] AuthenticateViewModel viewModel)
     {
         if (ModelState.IsValid is false)
             return BadRequest(ModelState);
 
+        var request = viewModel.MapToRequest();
         var response = await _accountService.LoginAsync(request);
 
         if (response.Status is not ResponseStatus.Success)
