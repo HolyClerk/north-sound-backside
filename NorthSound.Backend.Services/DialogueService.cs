@@ -39,7 +39,10 @@ public class DialogueService : IDialogueService
                 (dialogue.FirstUserId == secondUser.Id && dialogue.SecondUserId == firstUser.Id));
 
         if (existingDialogue is not null)
+        {
+            var options = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
             _memoryCache.Set(lowestId, existingDialogue);
+        }
 
         return existingDialogue;
     }
