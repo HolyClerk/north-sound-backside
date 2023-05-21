@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using NorthSound.Backend.DAL;
 using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.POCO.Chat;
@@ -9,20 +10,36 @@ namespace NorthSound.Backend.Services;
 public class DialogueService : IDialogueService
 {
     private readonly ApplicationContext _context;
+    private readonly IMemoryCache _memoryCache;
 
-    public DialogueService(ApplicationContext context)
+    public DialogueService(ApplicationContext context, 
+        IMemoryCache memoryCache)
     {
         _context = context;
+        _memoryCache = memoryCache;
     }
 
     public async Task<Dialogue?> GetDialogueAsync(User firstUser, User secondUser)
     {
+        // Поиск и сохраненеи происходит по нахождению наименьшего айди пользователя.
+        // Если у 1 пользователя айди меньше чем у второго - его айди и будет использоваться
+        // в качестве ключа в кеше для диалога.
+        int lowestId = firstUser.Id < secondUser.Id ? firstUser.Id : secondUser.Id;
+
+        _memoryCache.TryGetValue(lowestId, out Dialogue? cachedDialogue);
+
+        if (cachedDialogue is not null)
+            return cachedDialogue;
+
         Dialogue? existingDialogue = await _context.Dialogues
             .AsNoTracking()
             .Include(x => x.Messages)
             .FirstOrDefaultAsync(dialogue =>
                 (dialogue.FirstUserId == firstUser.Id && dialogue.SecondUserId == secondUser.Id) ||
                 (dialogue.FirstUserId == secondUser.Id && dialogue.SecondUserId == firstUser.Id));
+
+        if (existingDialogue is not null)
+            _memoryCache.Set(lowestId, existingDialogue);
 
         return existingDialogue;
     }
