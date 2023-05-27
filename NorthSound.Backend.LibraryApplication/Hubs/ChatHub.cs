@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.SignalR;
 using NorthSound.Backend.Domain.POCO.Chat;
 using NorthSound.Backend.Domain.Responses;
+using NorthSound.Backend.Domain.ViewModels;
 using NorthSound.Backend.Services.Abstractions;
 
 namespace NorthSound.Backend.LibraryApplication.Hubs;
 
 [Authorize]
-public class ChatHub : Hub
+public class ChatHub : Hub<IChatHub>
 {
     private readonly IChatService _chatService;
     private readonly ILogger<ChatHub> _logger;
@@ -67,11 +68,6 @@ public class ChatHub : Hub
         
         await Clients
             .Client(response.Receiver.Connection.Id)
-            .SendAsync("ReceiveMessage", response.Sender.CurrentUser.Name, response.Message.Value);
+            .ReceiveMessage(response.Sender.CurrentUser.Name, response.Message.Value);
     }
-}
-
-public interface IChatClient
-{
-    Task ReceiveMessage(string username, string message);
 }
