@@ -1,13 +1,12 @@
-﻿using NorthSound.Backend.Domain.Entities;
-using NorthSound.Backend.Domain.Responses;
+﻿using NorthSound.Backend.Domain.Responses;
 
 namespace NorthSound.Backend.Domain.POCO.Chat;
 
 public class MessageResponse
 {
-    public ChatUser Sender { get; set; }
+    public Session Sender { get; set; }
 
-    public ChatUser Receiver { get; set; }
+    public Session Receiver { get; set; }
 
     public MessageDTO Message { get; set; }
 
@@ -15,7 +14,7 @@ public class MessageResponse
 
     public ResponseStatus Status { get; set; }
 
-    public static MessageResponse Success(ChatUser sender, ChatUser receiver, MessageDTO message)
+    public static MessageResponse Success(Session sender, Session receiver, MessageDTO message)
     {
         return new MessageResponse
         {

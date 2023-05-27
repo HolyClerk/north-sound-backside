@@ -9,14 +9,14 @@ namespace NorthSound.Backend.Services;
 
 public class ChatService : IChatService
 {
-    private readonly IChatSessions _sessions;
+    private readonly ISessions _sessions;
     private readonly IAccountService _accountService;
     private readonly IDialogueService _dialogueService;
 
     public ChatService(
         IAccountService accountService,
         IDialogueService dialogueService,
-        IChatSessions sessions)
+        ISessions sessions)
     {
         _accountService = accountService;
         _dialogueService = dialogueService;
@@ -33,42 +33,42 @@ public class ChatService : IChatService
         return BuildMessageResponse(createdMessage);
     }
 
-    public async Task<GenericResponse<ChatUser>> AddChatUserAsync(ClaimsPrincipal userClaims, string connectionId)
+    public async Task<GenericResponse<Session>> CreateSessionAsync(ClaimsPrincipal userClaims, string connectionId)
     {
         var usernameClaim = userClaims.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Name);
         var existingUser = await _accountService.GetUserByNameAsync(usernameClaim!.Value);
 
         if (existingUser is null)
-            return Failed<ChatUser>("Пользователь не найден!");
+            return Failed<Session>("Пользователь не найден!");
 
-        var addedChatUser = _sessions.AddUser(existingUser, connectionId);
+        var addedChatUser = _sessions.AddSession(existingUser, connectionId);
 
         if (addedChatUser is null)
-            return Failed<ChatUser>("Пользователь уже существует!");
+            return Failed<Session>("Пользователь уже существует!");
 
         return Success(addedChatUser);
     }
 
-    public GenericResponse<ChatUser> GetChatUser(string connectionId)
+    public GenericResponse<Session> GetSession(string connectionId)
     {
-        var user = _sessions.GetChatUserByConnectionId(connectionId);
+        var user = _sessions.GetSession(connectionId);
 
         if (user is null)
-            return GenericResponse<ChatUser>.Failed("Пользователь не найден!");
+            return GenericResponse<Session>.Failed("Пользователь не найден!");
 
-        return GenericResponse<ChatUser>.Success(user);
+        return GenericResponse<Session>.Success(user);
     }
 
-    public IEnumerable<ChatUser> GetChatUsers()
-        => _sessions.GetAllConnections();
+    public IEnumerable<Session> GetSessions()
+        => _sessions.GetAllSessions();
     
-    public bool RemoveChatUser(string connectionId)
-        => _sessions.RemoveUser(connectionId);
+    public bool RemoveSession(string connectionId)
+        => _sessions.RemoveSession(connectionId);
     
     private async Task<Message?> CreateMessageAsync(MessageRequest request)
     {
         Dialogue? dialogue;
-        User? sender = _sessions.GetChatUserByConnectionId(request.SenderConnectionId)?.CurrentUser;
+        User? sender = _sessions.GetSession(request.SenderConnectionId)?.CurrentUser;
         User? receiver = await _accountService.GetUserByNameAsync(request.ReceiverUsername);
 
         if (sender is null || receiver is null)
@@ -84,8 +84,8 @@ public class ChatService : IChatService
 
     private MessageResponse BuildMessageResponse(Message message)
     {
-        var senderChatUser = _sessions.GetChatUserByUsername(message.Sender.Name);
-        var receiverChatUser = _sessions.GetChatUserByUsername(message.Receiver.Name);
+        var senderChatUser = _sessions.GetSessionByUsername(message.Sender.Name);
+        var receiverChatUser = _sessions.GetSessionByUsername(message.Receiver.Name);
 
         if (receiverChatUser is null || senderChatUser is null)
             return MessageResponse.Failed("Пользователь оффлайн");

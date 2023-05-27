@@ -54,7 +54,7 @@ builder.Services
     .AddScoped<IAccountService, AccountService>()               // —ервис, работающий с авторизацией пользователей
     .AddScoped<IDialogueService, DialogueService>()
     .AddScoped<IChatService, ChatService>()
-    .AddSingleton<IChatSessions, ChatSessionsHandler>();
+    .AddSingleton<ISessions, Sessions>();
 
 var app = builder.Build();
 

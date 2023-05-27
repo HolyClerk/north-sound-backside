@@ -2,11 +2,11 @@
 
 namespace NorthSound.Backend.Domain.POCO.Chat;
 
-public class ChatUser
+public class Session
 {
-    public ChatUser() { }
+    public Session() { }
 
-    public ChatUser(User user)
+    public Session(User user)
     {
         CurrentUser = user;
     }
