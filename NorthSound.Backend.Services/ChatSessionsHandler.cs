@@ -1,16 +1,14 @@
 ﻿using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.POCO.Chat;
-using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace NorthSound.Backend.Services;
 
-public class ConnectionManager : IConnectionManager
+public class ChatSessionsHandler : IChatSessions
 {
     private readonly List<ChatUser> _users;
 
-    public ConnectionManager()
+    public ChatSessionsHandler()
     {
         _users = new();
     }
@@ -41,8 +39,7 @@ public class ConnectionManager : IConnectionManager
         if (findedUser is null)
             return false;
 
-        _users.Remove(findedUser);
-        return true;
+        return _users.Remove(findedUser);
     }
 
     public bool IsChatUserConnected(User user)
@@ -53,4 +50,7 @@ public class ConnectionManager : IConnectionManager
 
     public ChatUser? GetChatUserByConnectionId(string connectionId)
         => _users.FirstOrDefault(x => x.Connection.Id == connectionId);
+
+    public IEnumerable<ChatUser> GetAllConnections()
+        => _users;
 }

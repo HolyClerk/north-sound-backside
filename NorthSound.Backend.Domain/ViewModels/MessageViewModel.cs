@@ -1,4 +1,4 @@
-﻿namespace NorthSound.Backend.Domain.POCO.Chat;
+﻿namespace NorthSound.Backend.Domain.ViewModels;
 
 public class MessageViewModel
 {

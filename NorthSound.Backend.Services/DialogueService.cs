@@ -1,100 +1,54 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using NorthSound.Backend.DAL;
 using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.POCO.Chat;
-using NorthSound.Backend.Domain.Responses;
 using NorthSound.Backend.Services.Abstractions;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace NorthSound.Backend.Services;
 
 public class DialogueService : IDialogueService
 {
-    private readonly IConnectionManager _connectionManager;
-    private readonly IAccountService _accountService;
     private readonly ApplicationContext _context;
+    private readonly IMemoryCache _memoryCache;
 
-    public DialogueService(
-        IConnectionManager connectionManager,
-        IAccountService accountService,
-        ApplicationContext context)
+    public DialogueService(ApplicationContext context, 
+        IMemoryCache memoryCache)
     {
-        _connectionManager = connectionManager;
-        _accountService = accountService;
         _context = context;
+        _memoryCache = memoryCache;
     }
 
-    public async Task<MessageResponse> PrepareMessageForSendingAsync(MessageRequest request)
+    public async Task<Dialogue?> GetDialogueAsync(User firstUser, User secondUser)
     {
-        var createdMessage = await CreateMessageInDatabaseAsync(request);
+        // Поиск и сохраненеи происходит по нахождению наименьшего айди пользователя.
+        // Если у 1 пользователя айди меньше чем у второго - его айди и будет использоваться
+        // в качестве ключа в кеше для диалога.
+        int lowestId = firstUser.Id < secondUser.Id ? firstUser.Id : secondUser.Id;
 
-        if (createdMessage is null)
-            return MessageResponse.Failed("Не удалось создать сообщение в базе данных");
+        _memoryCache.TryGetValue(lowestId, out Dialogue? cachedDialogue);
 
-        return CreateMessageResponse(createdMessage);
-    }
+        if (cachedDialogue is not null)
+            return cachedDialogue;
 
-    public async Task<GenericResponse<ChatUser>> AddChatUserAsync(ClaimsPrincipal userClaims, string connectionId)
-    {
-        var usernameClaim = userClaims.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Name);
-        var existingUser = await _accountService.GetUserByNameAsync(usernameClaim!.Value);
-
-        if (existingUser is null)
-            return Failed<ChatUser>("Пользователь не найден!");
-
-        var addedChatUser = _connectionManager.AddUser(existingUser, connectionId);
-
-        if (addedChatUser is null)
-            return Failed<ChatUser>("Пользователь уже существует!");
-
-        return Success(addedChatUser);
-    }
-
-    public void RemoveChatUser(string connectionId)
-    {
-        _connectionManager.RemoveUser(connectionId);
-    }
-
-    private async Task<MessageDTO?> CreateMessageInDatabaseAsync(MessageRequest request)
-    {
-        User? sender = _connectionManager.GetChatUserByConnectionId(request.SenderConnectionId)?.CurrentUser;
-        User? receiver = await _accountService.GetUserByNameAsync(request.ReceiverUsername);
-
-        // Если получать/отправлять некому
-        if (sender is null || receiver is null)
-            return null;
-
-        var message = new MessageDTO(receiver, sender, request.Message);
-        var dialogueDTO = await AddDialogueBetweenAsync(sender, receiver);
-        await AddMessageAsync(message, dialogueDTO);
-        await _context.SaveChangesAsync();
-
-        return message;
-    }
-
-    private MessageResponse CreateMessageResponse(MessageDTO message)
-    {
-        var senderChatUser = _connectionManager.GetChatUserByUsername(message.Sender.Name);
-        var receiverChatUser = _connectionManager.GetChatUserByUsername(message.Receiver.Name);
-
-        if (receiverChatUser is null || senderChatUser is null)
-            return MessageResponse.Failed("Пользователь оффлайн");
-
-        return MessageResponse.Success(senderChatUser, receiverChatUser, message);
-    }
-
-    private async Task<Dialogue> AddDialogueBetweenAsync(User firstUser, User secondUser)
-    {
         Dialogue? existingDialogue = await _context.Dialogues
             .AsNoTracking()
-            .FirstOrDefaultAsync(dialogue
-                => (dialogue.FirstUser.Id == firstUser.Id   && dialogue.SecondUser.Id == secondUser.Id)
-                || (dialogue.FirstUser.Id == secondUser.Id  && dialogue.SecondUser.Id == firstUser.Id));
+            .Include(x => x.Messages)
+            .FirstOrDefaultAsync(dialogue =>
+                (dialogue.FirstUserId == firstUser.Id && dialogue.SecondUserId == secondUser.Id) ||
+                (dialogue.FirstUserId == secondUser.Id && dialogue.SecondUserId == firstUser.Id));
 
         if (existingDialogue is not null)
-            return existingDialogue;
+        {
+            var options = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
+            _memoryCache.Set(lowestId, existingDialogue);
+        }
 
+        return existingDialogue;
+    }
+
+    public async Task<Dialogue> AddDialogueAsync(User firstUser, User secondUser)
+    {
         var newDialogue = new Dialogue
         {
             FirstUserId = firstUser.Id,
@@ -107,23 +61,23 @@ public class DialogueService : IDialogueService
         return newDialogue;
     }
 
-    private async Task AddMessageAsync(MessageDTO message, Dialogue dialogue)
+    public async Task<Message> AddMessageAsync(MessageDTO messageDTO, Dialogue dialogue)
     {
-        var messageDTO = new Message
+        var message = new Message
         {
-            SenderId = message.Sender.Id,
-            ReceiverId = message.Receiver.Id,
-            Text = message.Value,
+            SenderId = messageDTO.Sender.Id,
+            ReceiverId = messageDTO.Receiver.Id,
+            Text = messageDTO.Value,
             DialogueId = dialogue.Id,
             CreatedAt = DateTime.UtcNow,
         };
 
-        await _context.Messages.AddAsync(messageDTO);
+        await _context.Messages.AddAsync(message);
+        await _context.SaveChangesAsync();
+
+        await _context.Entry(message).Reference(m => m.Sender).LoadAsync();
+        await _context.Entry(message).Reference(m => m.Receiver).LoadAsync();
+
+        return message;
     }
-
-    private static GenericResponse<T> Success<T>(T data)
-        => GenericResponse<T>.Success(data);
-
-    private static GenericResponse<T> Failed<T>(string details) 
-        => GenericResponse<T>.Failed(details);
 }
