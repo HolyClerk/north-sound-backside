@@ -6,7 +6,7 @@ public class GenericResponse <T>
 {
     public ResponseStatus Status { get; set; } 
 
-    public T? Data { get; set; } = default!;
+    public T Data { get; set; } = default!;
 
     public string? Details { get; set; } 
 
