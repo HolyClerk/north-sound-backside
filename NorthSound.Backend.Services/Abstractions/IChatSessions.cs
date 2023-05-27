@@ -8,6 +8,7 @@ public interface IChatSessions
 {
     public ChatUser? AddUser(User user, string connectionId);
     public bool RemoveUser(string connectionId);
+    IEnumerable<ChatUser> GetAllConnections();   
     ChatUser? GetChatUserByUsername(string username);
     ChatUser? GetChatUserByConnectionId(string connectionId);
 }

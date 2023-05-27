@@ -9,4 +9,6 @@ public interface IChatService
     Task<MessageResponse> BuildMessageAsync(MessageRequest request);
     Task<GenericResponse<ChatUser>> AddChatUserAsync(ClaimsPrincipal userClaims, string connectionId);
     bool RemoveChatUser(string connectionId);
+    IEnumerable<ChatUser> GetChatUsers();
+    GenericResponse<ChatUser> GetChatUser(string connectionId);
 }

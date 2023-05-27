@@ -49,6 +49,19 @@ public class ChatService : IChatService
         return Success(addedChatUser);
     }
 
+    public GenericResponse<ChatUser> GetChatUser(string connectionId)
+    {
+        var user = _sessions.GetChatUserByConnectionId(connectionId);
+
+        if (user is null)
+            return GenericResponse<ChatUser>.Failed("Пользователь не найден!");
+
+        return GenericResponse<ChatUser>.Success(user);
+    }
+
+    public IEnumerable<ChatUser> GetChatUsers()
+        => _sessions.GetAllConnections();
+    
     public bool RemoveChatUser(string connectionId)
         => _sessions.RemoveUser(connectionId);
     

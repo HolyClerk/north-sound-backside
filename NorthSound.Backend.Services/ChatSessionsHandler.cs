@@ -50,4 +50,7 @@ public class ChatSessionsHandler : IChatSessions
 
     public ChatUser? GetChatUserByConnectionId(string connectionId)
         => _users.FirstOrDefault(x => x.Connection.Id == connectionId);
+
+    public IEnumerable<ChatUser> GetAllConnections()
+        => _users;
 }
