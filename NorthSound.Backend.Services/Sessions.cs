@@ -1,6 +1,7 @@
 ﻿using NorthSound.Backend.Domain.Entities;
 using NorthSound.Backend.Domain.POCO.Chat;
 using NorthSound.Backend.Services.Abstractions;
+using NorthSound.Backend.Services.Builders;
 
 namespace NorthSound.Backend.Services;
 
@@ -18,18 +19,14 @@ public class Sessions : ISessions
         if (IsUserConnected(user))
             return null;
 
-        var chatUser = new Session
-        {
-            CurrentUser = user,
-            Connection = new ChatConnection
-            {
-                CreatedAt = DateTime.Now,
-                Id = connectionId,
-            },
-        };
+        var builder = new SessionBuilder();
 
-        _sessions.Add(chatUser);
-        return chatUser;
+        var session = builder.SetUser(user)
+            .CreateConnection(connectionId)
+            .Build();
+
+        _sessions.Add(session);
+        return session;
     }
 
     public bool RemoveSession(string connectionId)
