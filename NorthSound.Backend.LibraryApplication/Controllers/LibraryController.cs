@@ -21,7 +21,7 @@ public class LibraryController : ControllerBase
     }
 
     [HttpGet]
-    public IEnumerable<SongDTO> GetAllSongs()
+    public IReadOnlyCollection<SongDTO> GetAllSongs()
     {
         return _library.GetSongs();
     }

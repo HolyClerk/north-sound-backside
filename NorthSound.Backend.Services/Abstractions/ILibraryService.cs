@@ -26,7 +26,7 @@ public interface ILibraryService
     /// Возвращает коллекцию сущностей <see cref="SongDTO"/> из базы данных.
     /// </summary>
     /// <returns>Коллекция <see cref="SongDTO"/></returns>
-    IEnumerable<SongDTO> GetSongs();
+    IReadOnlyCollection<SongDTO> GetSongs();
 
     /// <summary>
     /// Генерирует <see cref="GenericResponse{SongModel}"/> с содержимым типа <see cref="SongDTO"/>, на основе полученной модели из базы данных.
