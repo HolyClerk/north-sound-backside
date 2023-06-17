@@ -38,7 +38,7 @@ public class AccountService : IAccountService
         var newUser = request.MapToUser();
         var token = _tokenHandler.GenerateToken(newUser);
 
-        await CreateUserAsync(newUser);
+        await AddUserAsync(newUser);
 
         return GenericResponse<AuthenticateResponse>.Success(new AuthenticateResponse(newUser, token));
     }
@@ -71,7 +71,7 @@ public class AccountService : IAccountService
     public async Task<User?> GetUserByNameAsync(string username)
         => await _context.Users.FirstOrDefaultAsync(user => user.Name == username);
 
-    private async Task CreateUserAsync(User newUser)
+    private async Task AddUserAsync(User newUser)
     {
         newUser.CreatedAt = DateTime.UtcNow;
         await _context.Users.AddAsync(newUser);
