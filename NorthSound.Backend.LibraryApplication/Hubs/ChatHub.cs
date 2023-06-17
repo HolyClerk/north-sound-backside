@@ -32,7 +32,7 @@ public class ChatHub : Hub<IChatHub>
             return;
         }
 
-        var response = await _chatService.AddChatUserAsync(userClaims, connectionId);
+        var response = await _chatService.CreateSessionAsync(userClaims, connectionId);
 
         if (response.Status is not ResponseStatus.Success)
         {
@@ -50,14 +50,14 @@ public class ChatHub : Hub<IChatHub>
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var response = _chatService.GetChatUser(Context.ConnectionId);
+        var response = _chatService.GetSession(Context.ConnectionId);
 
         if (response.Status is not ResponseStatus.Success)
             return;
 
         var username = response.Data!.CurrentUser.Name;
 
-        _chatService.RemoveChatUser(Context.ConnectionId);
+        _chatService.RemoveSession(Context.ConnectionId);
         _logger.LogInformation("Пользователь отключен {}", username);
 
         await Clients.All.ReceiveDisconnectedNotification(new ChatUserDTO(username));
@@ -66,7 +66,7 @@ public class ChatHub : Hub<IChatHub>
 
     public async Task GetAllClients()
     {
-        var response = _chatService.GetChatUsers();
+        var response = _chatService.GetSessions();
         var dtoList = new List<ChatUserDTO>();
 
         foreach (var chatUser in response)

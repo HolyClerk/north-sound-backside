@@ -26,9 +26,9 @@ public class DialogueService : IDialogueService
         // в качестве ключа в кеше для диалога.
         int lowestId = firstUser.Id < secondUser.Id ? firstUser.Id : secondUser.Id;
 
-        _memoryCache.TryGetValue(lowestId, out Dialogue? cachedDialogue);
+        bool isCached = _memoryCache.TryGetValue(lowestId, out Dialogue? cachedDialogue);
 
-        if (cachedDialogue is not null)
+        if (isCached)
             return cachedDialogue;
 
         Dialogue? existingDialogue = await _context.Dialogues

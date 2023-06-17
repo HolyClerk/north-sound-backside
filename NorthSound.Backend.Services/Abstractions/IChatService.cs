@@ -7,8 +7,8 @@ namespace NorthSound.Backend.Services.Abstractions;
 public interface IChatService
 {
     Task<MessageResponse> BuildMessageAsync(MessageRequest request);
-    Task<GenericResponse<ChatUser>> AddChatUserAsync(ClaimsPrincipal userClaims, string connectionId);
-    bool RemoveChatUser(string connectionId);
-    IEnumerable<ChatUser> GetChatUsers();
-    GenericResponse<ChatUser> GetChatUser(string connectionId);
+    Task<GenericResponse<Session>> CreateSessionAsync(ClaimsPrincipal userClaims, string connectionId);
+    bool RemoveSession(string connectionId);
+    IEnumerable<Session> GetSessions();
+    GenericResponse<Session> GetSession(string connectionId);
 }

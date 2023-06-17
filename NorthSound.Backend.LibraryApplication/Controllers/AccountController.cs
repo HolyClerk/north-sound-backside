@@ -13,8 +13,7 @@ public class AccountController : ControllerBase
 {
     private readonly IAccountService _accountService;
 
-    public AccountController(
-        IAccountService userService)
+    public AccountController(IAccountService userService)
     {
         _accountService = userService;
     }
@@ -53,6 +52,7 @@ public class AccountController : ControllerBase
     [Authorize]
     public async Task<ActionResult> GetSecret()
     {
+        // TODO
         return Ok("Ok");
     }
 }

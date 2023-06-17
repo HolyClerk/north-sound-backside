@@ -28,7 +28,7 @@ public class LibraryService : ILibraryService
         _locator = locator;
     }
 
-    public IEnumerable<SongDTO> GetSongs() 
+    public IReadOnlyCollection<SongDTO> GetSongs() 
     {
         var songs = _context.Songs;
         var songModels = new List<SongDTO>();
